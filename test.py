@@ -4,10 +4,13 @@ import json
 import couchdb
 couch = couchdb.Server('http://192.168.8.1:5984/')
 db = couch['sensors']
+tempSensor = { beagle : '10-0008029674ee', outside : '10-000802964c0d', cylinder : '10-000802961f0d', stove : '', canal : '' }
 
 beagleTmp = "/sys/bus/w1/devices/10-0008029674ee/w1_slave"
 outTmp    = "/sys/bus/w1/devices/10-000802964c0d/w1_slave"
 stoveTmp  = "/sys/bus/w1/devices/10-000802961f0d/w1_slave"
+waterTmp  = "/sys/bus/w1/devices/10-000802961f0d/w1_slave"
+
 def timestamp():
     timestamp = json.dumps(datetime.datetime.now().isoformat()).split('"')[1]
     return timestamp
