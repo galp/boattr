@@ -5,7 +5,7 @@ import datetime
 #couch = couchdb.Server('http://192.168.8.1:5984/')
 #db = couch['sensors']
 path = "/sys/bus/w1/devices/"
-tempSensor = { 'beagle' : '10-0008029674ee', 'out' : '10-000802964c0d', 'cylinder' : '10-000802961f0d', 'stove' : '', 'canal' : '' }
+tempSensor = { 'beagle' : '10-0008029674ee', 'out' : '10-000802964c0d', 'cylinder' : '10-000802961f0d', 'stove' : '10-00080296978d' }
 
 beagleTmp = "/sys/bus/w1/devices/10-0008029674ee/w1_slave"
 outTmp    = "/sys/bus/w1/devices/10-000802964c0d/w1_slave"
