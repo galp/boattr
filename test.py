@@ -1,5 +1,6 @@
 import time
 import datetime
+import rrdtool
 #import json
 #import couchdb
 #couch = couchdb.Server('http://192.168.8.1:5984/')
@@ -15,6 +16,7 @@ def timestamp():
 def getTemp(sensor):
     raw = open(path+sensor+"/w1_slave", "r").read()
     print "%s  : %s C" %(sensor, str(float(raw.split("t=")[-1])/1000))
+    rrdtool.update("/run/shm/"+sensor+".rrd", "N:%f" % current_temp)
     return raw
 
 def printTemp():
