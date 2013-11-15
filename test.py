@@ -17,7 +17,7 @@ def getTemp(sensor):
     raw = open(path+sensor+"/w1_slave", "r").read()
     current_temp = float(raw.split("t=")[-1])/1000
     print "%s  : %s C" %(sensor, str(current_temp))
-    rrdtool.update("/run/shm/"+sensor+".rrd", "N:%f" % current_temp)
+    rrdtool.update("/root/rrd/"+sensor+".rrd", "N:%f" % current_temp)
     return raw
 
 def printTemp():
