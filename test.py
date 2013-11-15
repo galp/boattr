@@ -29,8 +29,8 @@ while True:
     for k in tempSensor.keys():
         address = tempSensor[k]
         getTemp(address)
-        time.sleep(1)
-
+        time.sleep(2)
+        print "----------"
     #print "Temperature is %s %s degrees" %(str(float(raw.split("t=")[-1])/1000),str(float(raw1.split("t=")[-1])/1000))
     #doc = {"_id": timestamp() , "temp1" : str(float(raw.split("t=")[-1])/1000), "temp2" : str(float(raw1.split("t=")[-1])/1000)}
     #db.save(doc)
