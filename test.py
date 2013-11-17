@@ -13,8 +13,8 @@ def timestamp():
     timestamp = json.dumps(datetime.datetime.now().isoformat()).split('"')[1]
     return timestamp
 
-def getTemp(sensor):
-    raw = open(path+sensor+"/w1_slave", "r").read()
+def getTemp(sensor,address):
+    raw = open(path+address+"/w1_slave", "r").read()
     current_temp = float(raw.split("t=")[-1])/1000
     print "%s  : %s C" %(sensor, str(current_temp))
     #rrdtool.update("/root/rrd/"+sensor+".rrd", "N:%f" % current_temp)
@@ -25,10 +25,9 @@ def printTemp():
 
 while True:
     #raw = open(path+beagle+"/w1_slave", "r").read()
-    for k in tempSensor.keys():
-        address = tempSensor[k]
-        getTemp(address)
-        time.sleep(2)
+    for k,v in tempSensor.iteritems():
+        getTemp(k,v)
+        time.sleep(1)
     print "----------"
     #print "Temperature is %s %s degrees" %(str(float(raw.split("t=")[-1])/1000),str(float(raw1.split("t=")[-1])/1000))
     #doc = {"_id": timestamp() , "temp1" : str(float(raw.split("t=")[-1])/1000), "temp2" : str(float(raw1.split("t=")[-1])/1000)}
