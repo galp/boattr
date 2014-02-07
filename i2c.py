@@ -1,7 +1,6 @@
 import smbus
 import time, os
 import datetime
-import rrdtool
 import socket 
 import json
 import couchdb
@@ -17,7 +16,7 @@ def timestamp():
     timestamp = json.dumps(datetime.datetime.now().isoformat()).split('"')[1]
     return timestamp
 
-results8 = []
+
 results10 = []
 Vcc=5.0
 mid=Vcc/2
