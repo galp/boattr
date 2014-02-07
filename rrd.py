@@ -1,4 +1,4 @@
-#!/usr/bin/python
+q#!/usr/bin/python
 
 import rrdtool
 

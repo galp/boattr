@@ -5,7 +5,7 @@ import socket
 import json
 #import couchdb
 #couch = couchdb.Server('http://192.168.8.1:5984/')
-#db = couch['sensors']
+db = couch['sensors']
 beauty_ip = "10.70.60.1"
 beauty_port = 2003
 path = "/sys/bus/w1/devices/"

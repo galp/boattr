@@ -1,4 +1,4 @@
-import time
+import time, sys, subprocess
 import datetime
 import socket 
 
@@ -13,23 +13,45 @@ def timestamp():
 
 def getIfBytes(iface):
     raw = (subprocess.Popen(["awk", "/eth0/ { print $2, $10}","/proc/net/dev"], stdout=subprocess.PIPE).communicate()[0]).split()
-    rx = int(raw[0])
-    tx = int(raw[1])
+    rx = raw[0]
+    tx = raw[1]
+    print rx,tx
     return [rx,tx]
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
 now = str(time.time())
 
 data=getIfBytes('eth0')
-if '/tmp/rxtx' :
-	read it
-	cur_rx=data[0]-old_rx
-	cur_tx=data[1]-old_tx
+try:
+	rxtx= open('/tmp/rxtx').read()
+	old_rx = rxtx.strip().split()[0]
+	old_tx = rxtx.strip().split()[1]
+        print "old"
+        print old_rx,old_tx
+except IOError:
+	
+	print "No bw data"
+	open('/tmp/rxtx','w').write(" ".join(data))
+	sys.exit()
+	#write and exit
+print data
+cur_rx=int(data[0])-int(old_rx)
+cur_tx=int(data[1])-int(old_tx)
+print cur_rx,cur_tx
 #write data to file
+open('/tmp/rxtx','w').write('%i %i' % (cur_rx, cur_tx))
+print ""
 graph  = ".".join(['boat.bw','eth0'])
 graph  = "boat.bandwidth.rx"
-packet = " ".join([graph, cur_rx, now])
-print "%s  : %s C" %(k, str(cur_rx))
+packet = " ".join([graph, str(cur_rx), now])
+print packet
+sock.sendto(packet, (beauty_ip,beauty_port))
+
+graph  = "boat.bandwidth.tx"   
+packet = " ".join([graph, str(cur_tx), now])
+
+print "%s  : %s C" %('rx', str(cur_rx))
+print "%s  : %s C" %('tx', str(cur_tx))
 print packet
 sock.sendto(packet, (beauty_ip,beauty_port))
 
