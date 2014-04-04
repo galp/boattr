@@ -53,7 +53,7 @@ def getADCvalues(address):
     sensor=0
     adc_raw={'adc0': [],'adc1': [],'adc2':[],'adc3': [],'adc4': [],'adc5': [],'adc6':[],'adc7': [],'adc8': [],'adc9': [] }
     for reading in range(10):    
-        i2cBus.write_byte(0x28, 0x00)
+        i2cBus.write_byte(address, 0x00)
         adc = i2cBus.read_i2c_block_data(0x28, 0x00, 0x14)
         pairs = zip(adc[::2], adc[1::2])
         sensor=0
@@ -86,7 +86,6 @@ def toGraphite(category,name,value,timestamp):
     graph  = ".".join(['boat',category,name])
     packet = " ".join([graph, str(value), timestamp])
     sock.sendto(packet, (beauty_ip,beauty_port))
-    print packet
 
 def toCouchdb(cat,data):
     doc = { "_id": now , "type" : cat, "data": data }
@@ -97,8 +96,8 @@ def toCouchdb(cat,data):
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
 now = str(time.time())
 
-i2c1 = getADCvalues('0x28')
-print i2c1
+i2c1 = getADCvalues(0x28)
+#print i2c1
 
 solar = current(i2c1['adc0'],'solar',acs714)
 genny = current(i2c1['adc1'],'genny',acs709)
@@ -110,7 +109,7 @@ toGraphite('current',solar['name'],solar['amps'],now)
 toCouchdb(cat,solar)
 now = str(time.time())
 toGraphite('current',genny['name'],genny['amps'],now)
-toCouchdb(cat,genny)
+toCouchdb('current',genny)
 
 now = str(time.time())
 toGraphite('volts','batteries',bat1['volts'],now)
@@ -118,9 +117,12 @@ toCouchdb('volts',bat1)
 
 now = str(time.time())
 temps = get1wireValues(tempSensor)
+
 toCouchdb('temp',temps)
-#toGraphite('temp',bat1['name'],bat1['volts'],now)
-#print temps
+for s,v in temps.iteritems():
+    toGraphite('temp',s,temps[s],now)
+
+
 
 
 
