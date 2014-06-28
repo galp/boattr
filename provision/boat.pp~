@@ -1,0 +1,4 @@
+class boatmon {
+  packagelist = [ 'screen', 'emacs-nox', 'curl' ]
+
+}
