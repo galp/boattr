@@ -1,6 +1,6 @@
 
 class packages {
-  $packagelist = [ 'screen', 'emacs23-nox', 'curl' ]
+  $packagelist = [ 'screen', 'emacs23-nox', 'puppet-el','curl' ]
   package { $packagelist : ensure => installed}
 }
 
