@@ -1,9 +1,24 @@
 
 class packages {
-  $packagelist = [ 'screen', 'emacs23-nox', 'puppet-el','curl' ]
+  $packagelist = [ 'screen', 'emacs23-nox', 'puppet-el','curl','python-couchdb', 'python-smbus',' build-essential' ]
+  $devpackagelist = ['i2c-tools]'
+  
   package { $packagelist : ensure => installed}
 }
+class dashboard {
+  $rubypackages=['ruby1.9.1-dev','rubygems','bundler']
+  package { $rubypackages : ensure => installed}
 
+  package {'dashing' :
+    ensure   => installed,
+    provider => gem,
+    require  => Package[$rubypackages],    
+  }
+  file  {'/root/.gemrc' :
+    ensure  => file,
+    content => 'gem: --no-ri --no-rdoc',
+    }
+}
 class couchdb {
   package { 'couchdb' : ensure => installed}
 }
@@ -59,6 +74,6 @@ class network {
   #
 }
 include users
-include storage
+#include storage
 include packages
 include couchdb

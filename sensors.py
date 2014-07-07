@@ -1,6 +1,5 @@
 import time, os
 import datetime
-import rrdtool
 import socket 
 import json
 import couchdb
@@ -13,7 +12,7 @@ path = "/sys/bus/w1/devices/"
 tempSensor = { 'beagle' : '10-0008029674ee', 'out' : '10-000802964c0d', 'cylinder' : '10-000802961f0d', 'stove' : '10-00080296978d', 'canal' : '28-000004ee99a8' }
 acs714=0.066
 acs709=0.028
-
+i2cAdcAddress=0x28
 i2cBus = smbus.SMBus(1)
 #
 Vcc=5.0
@@ -96,7 +95,7 @@ def toCouchdb(cat,data):
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
 now = str(time.time())
 
-i2c1 = getADCvalues(0x28)
+i2c1 = getADCvalues(i2cAdcAddress)
 #print i2c1
 
 solar = current(i2c1['adc0'],'solar',acs714)
