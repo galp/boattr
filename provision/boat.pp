@@ -1,9 +1,11 @@
 
 class packages {
   $packagelist = [ 'screen', 'emacs23-nox', 'puppet-el','curl','python-couchdb', 'python-smbus',' build-essential' ]
-  $devpackagelist = ['i2c-tools]'
+  $devpackagelist = ['i2c-tools]']
   
-  package { $packagelist : ensure => installed}
+  package { $packagelist :
+    ensure => installed,
+  }
 }
 class dashboard {
   $rubypackages=['ruby1.9.1-dev','rubygems','bundler']
