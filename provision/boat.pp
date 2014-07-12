@@ -23,6 +23,8 @@ class dashboard {
 }
 class couchdb {
   package { 'couchdb' : ensure => installed}
+  package {'couchrest' : ensure   => installed, provider => gem }
+
 }
 
 class storage (
@@ -75,7 +77,16 @@ class users {
 class network {
   #
 }
+class boattr {
+  package {'i2c' :
+    ensure   => installed,
+    provider => gem,
+    #require  => Package[$rubypackages],    
+  }
+  
+}
 include users
 #include storage
 include packages
 include couchdb
+include boattr
