@@ -6,17 +6,20 @@ require "i2c/i2c"
 require "i2c/backends/i2c-dev"
 require 'couchrest'
 require 'simple-graphite'
+require 'socket'
 
 module Boattr
   class Sensors
     @@data = []
     @@device 
+    @@OWdevices = []
     attr_reader :name, :address, :i2cBus, :data
     def initialize(params)
       @name     = params['name']
       @address  = params['address']
       @@device = ::I2C.create(params['i2cBus'])
       self.read()
+      self.onewire()
     end
     def read
       @data = []
@@ -30,23 +33,43 @@ module Boattr
       @name    = name
       @raw     = @@data[address]
       @volts = @raw * 0.015357
-      return { 'name' => @name, 'type' => 'voltage', 'raw' => @raw, 'volts' => @volts.round(3) }
+      return { 'name' => @name, 'type' => 'volts', 'raw' => @raw, 'value' => @volts.round(3) }
     end
     def current(name,address)
       @name    = name
       @raw     = @@data[address]
       @volts   = (@raw*0.004887)
       @amps    = (@volts-2.5)/0.066 
-      return { 'name' => @name, 'type' => 'current', 'raw' => @raw, 'volts'=> @volts.round(3), 'amps' => @amps.round(3)} 
+      return { 'name' => @name, 'type' => 'current', 'raw' => @raw, 'value' => @amps.round(3)} 
+    end
+    def onewire()
+      @basedir  = '/sys/bus/w1/devices/'
+      Dir.chdir(@basedir)
+      @@OWdevices = Dir['*-*']
+      return @@OWdevices
     end
     def temperature(name,address)
+      @name     = name
+      @address  = address
+      @basedir  = '/sys/bus/w1/devices/'
+      if @@OWdevices.include?(@address) then
+        file = File.open("#{@basedir}/#{address}/w1_slave",'r')
+        if file.readline().include?('YES') then ## Is CRC valid in the first line? lets read the second and extract the temp
+          @temp = file.readline().split()[-1].split('=')[-1].to_i/1000.0
+          return { 'name' => @name, 'address' => @address, 'type' => 'temp', 'value' => @temp.round(3) }
+        end
+      end
     end
     def waterlevel(name,address)
+      @name     = name
+      @address  = address
+      @raw      = @@data[address]
+      return { 'name' => @name, 'type' => 'water', 'value' => @raw }
     end
   end
   class Data  
     def initialize()
-      @g  = Graphite.new({:host => "localhost", :port => 2003})
+      @g     = Graphite.new({:host => "10.70.60.1", :port => 2003})
       @db = CouchRest.database!("http://localhost:5984/couchrest-test")
     end
     def to_db(sensor_data)
@@ -56,7 +79,21 @@ module Boattr
         p x
       end
     end
-    def to_graphite
+    def to_graphite(sensor_data)
+      @base  = 'foo'
+      @data  = sensor_data
+      #p "#{@base}.#{@type}.#{@name} #{@value} #{@g.time_now}"
+      @data.each() do |x|
+        if x.nil? then 
+          next
+        end
+        @type  = x['type']
+        @name  = x['name']
+        @value = x['value']
+        @g.push_to_graphite do |graphite|
+          graphite.puts "#{@base}.#{@type}.#{@name} #{@value} #{@g.time_now}"
+        end
+      end
     end
     def now
       return Time.now.to_f.round(2).to_s
@@ -64,21 +101,3 @@ module Boattr
   end
 
 end
-
-brain02 = {
-  'name'    => 'analog/i2c from brain2',
-  'address' => 0x28,
-  'i2cBus'  => '/dev/i2c-1',
-  'couchdb' => true,
-}
-
-
-sensors=Boattr::Sensors.new(brain02)
-#p foo.read()
-
-brain02_sensors=[sensors.voltage('bat',1), sensors.current('amps',0)]
-
-Boattr::Data.new().to_db(brain02_sensors)
-
-
-
