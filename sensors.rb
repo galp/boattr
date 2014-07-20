@@ -13,10 +13,10 @@ module Boattr
     @@data = []
     @@device 
     @@OWdevices = []
-    attr_reader :name, :address, :i2cBus, :data
+    attr_reader :location, :i2cAddress, :i2cBus, :data, :basename
     def initialize(params)
-      @name     = params['name']
-      @address  = params['address']
+      @@basename    = params['basename']
+      @i2cAddress  = params['i2cAddress']
       @@device = ::I2C.create(params['i2cBus'])
       self.read()
       self.onewire()
@@ -24,7 +24,7 @@ module Boattr
     def read
       @data = []
       # read 20 bytes from slave, convert to decimals, and finaly in 10bit values.
-      @adc = @@device.read(address, 0x14, 0x00).unpack('C*').map {|e| e.to_s 10}
+      @adc = @@device.read(i2cAddress, 0x14, 0x00).unpack('C*').map {|e| e.to_s 10}
       #slice the 20 byte array into pairs (MSB,LSB) and convert. 
       @adc.each_slice(2) {|a| @@data << a[0].to_i*256+a[1].to_i}
       return @@data
@@ -68,19 +68,26 @@ module Boattr
     end
   end
   class Data  
-    def initialize()
-      @g     = Graphite.new({:host => "10.70.60.1", :port => 2003})
-      @db = CouchRest.database!("http://localhost:5984/couchrest-test")
+    def initialize(params)
+      @graphite = params['graphite']
+      @couchdb  = params['couchdb']
+      @@basename = params['basename']
+      @g     = Graphite.new({:host => "#{@graphite}", :port => 2003})
+      @sensorsdb = CouchRest.database!("http://#{@couchdb}:5984/#{@@basename}-sensors")
     end
     def to_db(sensor_data)
       @data  = sensor_data
       @data.each() do |x|
-        @db.save_doc({ "_id" => now() , "data" => x })
+        if x.nil? then 
+          next
+        end
         p x
+        @doc ={ "_id" => now() }.merge x
+        @sensorsdb.save_doc(@doc)
       end
     end
     def to_graphite(sensor_data)
-      @base  = 'foo'
+      @base  = @@basename
       @data  = sensor_data
       #p "#{@base}.#{@type}.#{@name} #{@value} #{@g.time_now}"
       @data.each() do |x|
@@ -96,7 +103,13 @@ module Boattr
       end
     end
     def now
+      #used by to_db()
       return Time.now.to_f.round(2).to_s
+    end
+    def to_dashboard(sensor_data)
+      @name =  @@basename
+      HTTParty.post('http://localhost:3030/widgets/karma',
+                    :body => { auth_token: "YOUR_AUTH_TOKEN", current: 1000 }.to_json)
     end
   end
 

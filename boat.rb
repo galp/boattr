@@ -1,27 +1,15 @@
-require './sensors.rb'
+require '/root/boatmon/sensors.rb'
 hostname = Socket.gethostname
 
-brain02 = {
-  'name'    => 'analog/i2c from brain2',
-  'address' => 0x28,
-  'i2cBus'  => '/dev/i2c-1',
-  'couchdb' => 'localhost',
-
-}
 brain01 = {
   'description' => 'analog/i2c from brain01',
-  'name'        => 'boat'
-  'address'     => 0x28,
+  'basename'    => 'boat',
+  'i2cAddress'  => 0x28,
   'i2cBus'      => '/dev/i2c-1',
   'couchdb'     => 'localhost',
+  'dashboard'   => 'localhost',
+  'graphite'   => '10.70.60.1',
 }
-
-OneWireDevices = { 
-  'beagle' => '10-0008029674ee', 'out' => '10-000802964c0d', 
-  'cylinder' => '10-000802961f0d', 'stove' => '10-00080296978d', 
-  'canal' => '28-000004ee99a8', 
-}
-OneWireSensors = { '10-0008029674ee' => 'in', '10-000802964c0d' => 'out', '10-000802961f0d' => 'cylinder', '10-00080296978d' => 'stove', '28-000004ee99a8' => 'canal' } 
 
 p hostname
 
@@ -44,7 +32,8 @@ brain01_sensors =
     sensors.temperature('calan','28-000004ee99a8'),
 ]
 
-Boattr::Data.new().to_db(brain01_sensors)
-Boattr::Data.new().to_graphite(brain01_sensors)
 
+Boattr::Data.new(brain01).to_db(brain01_sensors)
+Boattr::Data.new(brain01).to_graphite(brain01_sensors)
+#Boattr::Data.new(brain01).to_dashboard(brain01_sensors)
 
