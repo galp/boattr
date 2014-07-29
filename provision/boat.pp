@@ -89,6 +89,7 @@ class dnsmasq (
   $subnet    = '192.168.100',
   $ensure    = 'stopped',
   $interface = 'br0'
+  )
 {
 
   $packages  = ['dnsmasq']
