@@ -1,0 +1,30 @@
+# loopback network interface
+auto lo
+iface lo inet loopback
+
+# primary network interface
+auto eth0
+iface eth0 inet manual
+
+# wireless network interfaces
+auto wlan0
+iface wlan0 inet manual
+
+auto wlan1
+iface wlan1 inet manual
+
+#usb 3g/4g
+allow-hotplug usb0
+auto usb0
+iface usb0 inet dhcp
+allow-hotplug usb1
+auto usb1
+iface usb1 inet dhcp
+
+# bridge
+auto br0
+iface br0 inet static
+        address  <%= @subnet %>.1
+        netmask  255.255.255.0
+        bridge_ports eth0
+
