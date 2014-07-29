@@ -124,9 +124,9 @@ node brain00 inherits base {
   $domain    = 'boat.dev'
   $interface = 'br0'
   $ssid      = 'boat'
-
-  class wireless::ap { 'ssid' => $ssid }
-  class dnsmasq { 'enabled' => true, 'subnet' => $subnet, 'interface' => $interface }
+  
+  class { 'wireless::ap' :  'ssid' => $ssid }
+  class { 'dnsmasq' : 'enabled' => true, 'subnet' => $subnet, 'interface' => $interface }
 
   include storage
   include couchdb
@@ -139,7 +139,7 @@ node brain01 inherits base {
   $ip        = "#{subnet}.99"
   $interface = 'eth0'
   
-  class dnsmasq { 'ensure' => 'stopped', 'subnet' => $subnet, 'interface' => $interface }
+  class { 'dnsmasq' : 'ensure' => 'stopped', 'subnet' => $subnet, 'interface' => $interface }
   
 }
 
