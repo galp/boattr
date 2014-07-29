@@ -64,6 +64,8 @@ module Boattr
       @name     = name
       @address  = address
       @raw      = @@data[address]
+      @volts    = @raw*0.00472
+      p @volts
       return { 'name' => @name, 'type' => 'water', 'value' => @raw }
     end
   end

@@ -8,9 +8,9 @@ class packages {
   }
 }
 class dashboard {
-  $rubypackages=['ruby1.9.1-dev','rubygems','bundler']
-  package { $rubypackages : ensure => installed}
-
+  $rubypackages=['ruby1.9.1-dev','rubygems','bundler', 'nodejs']
+  package { $rubypackages : ensure => installed
+}
   package {'dashing' :
     ensure   => installed,
     provider => gem,
@@ -77,6 +77,24 @@ class users {
 class network {
   #
 }
+class dnsmasq {
+  $subnet    = '192.168.100'
+  $domain    = 'camp.dev'
+  $interface = 'br0'
+  $packages  = ['dnsmasq']
+
+  package {$packages : ensure => present }
+  service { 'dnsmasq' : ensure  => running,
+    require => Package[$packages]
+  }
+  file {'/etc/dnsmasq.conf' : 
+    ensure  => present,
+    content => template("teplates/dnsmasq/dnsmasq.conf"),
+    notify  => Service['dnsmasq'],
+    }
+
+  file 
+  }
 class boattr {
   package {'i2c' :
     ensure   => installed,
@@ -85,6 +103,7 @@ class boattr {
   }
   
 }
+
 include users
 #include storage
 include packages
