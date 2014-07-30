@@ -83,7 +83,13 @@ class users {
   }
 }
 class network {
-  
+  $packages = ['bridge-utils']
+  package {$packages : ensure => present }
+
+  file {'/etc/network/interfaces' :
+    ensure  => present,
+    content => template('teplates/network/interfaces'),
+  }
 }
 class dnsmasq (
   $subnet    = '192.168.100',
@@ -93,9 +99,7 @@ class dnsmasq (
 {
 
   $packages  = ['dnsmasq']
-
   package {$packages : ensure => present }
-
   service { 'dnsmasq' : ensure  => running,
     require => Package[$packages]
   }
@@ -106,6 +110,7 @@ class dnsmasq (
   }
   
 }
+
 class boattr {
   package {'i2c' :
     ensure   => installed,
@@ -114,6 +119,7 @@ class boattr {
   }
   
 }
+
 node base {
   include users
   include packages
@@ -125,21 +131,20 @@ node brain00 inherits base {
   $interface = 'br0'
   $ssid      = 'boat'
   
-  class { 'wireless::ap' :  'ssid' => $ssid }
-  class { 'dnsmasq' : 'enabled' => true, 'subnet' => $subnet, 'interface' => $interface }
-
+  class { 'wireless::ap' :  ssid => $ssid, }
+  class { 'dnsmasq': ensure => true, subnet => $subnet, interface => $interface }
   include storage
   include couchdb
   include boattr
 }
 
-node brain01 inherits base {
-  $subnet    = '192.168.100'
-  $domain    = 'camp.dev'
-  $ip        = "#{subnet}.99"
+node brain02  {
+  $subnet    = '192.168.8'
+  $domain    = 'camp'
+  $ip        = "${subnet}.99"
   $interface = 'eth0'
   
-  class { 'dnsmasq' : 'ensure' => 'stopped', 'subnet' => $subnet, 'interface' => $interface }
+  class { 'dnsmasq': ensure => 'stopped', subnet => $subnet, interface => $interface }
   
 }
-
+}
