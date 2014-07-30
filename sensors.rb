@@ -7,6 +7,7 @@ require "i2c/backends/i2c-dev"
 require 'couchrest'
 require 'simple-graphite'
 require 'socket'
+require 'uri'
 
 module Boattr
   class Sensors
@@ -76,6 +77,7 @@ module Boattr
       @@basename = params['basename']
       @g     = Graphite.new({:host => "#{@graphite}", :port => 2003})
       @sensorsdb = CouchRest.database!("http://#{@couchdb}:5984/#{@@basename}-sensors")
+      @statsdb   = CouchRest.database!("http://#{@couchdb}:5984/#{@@basename}-stats")
     end
     def to_db(sensor_data)
       @data  = sensor_data
@@ -87,6 +89,33 @@ module Boattr
         @doc ={ "_id" => now() }.merge x
         @sensorsdb.save_doc(@doc)
       end
+    end
+    def create_views(sensor_data)
+      @sensorsdb.save_doc(
+                          {
+                            "_id" => "_design/solar", 
+                            :views => {
+                              :test => {
+                                :map => "function(doc) {  if (doc.name == \"solar\") {  emit(doc._id, doc.value);  }}"
+                              }
+                            }
+                          })
+    end
+    def amphours(name,hours)
+      @sum  = 0
+      @from = Time.now().to_i-hours*60*60
+      @view = URI.escape("solar1/test?startkey=\"#{@from}\"")
+      p @view
+      @data = @sensorsdb.view(@view)
+      @total_rows = @data['total_rows']
+      @rows       = @data['rows']
+      @rows.each() do |r|
+        p r
+        @sum+=r['value']
+      end
+      @ampm = @sum/@total_rows
+      @amph = @ampm/60
+      return @amph
     end
     def to_graphite(sensor_data)
       @base  = @@basename
