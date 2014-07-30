@@ -93,28 +93,39 @@ module Boattr
     def create_views(sensor_data)
       @sensorsdb.save_doc(
                           {
-                            "_id" => "_design/solar", 
+                            "_id" => "_design/current", 
                             :views => {
-                              :test => {
+                              :solar => {
                                 :map => "function(doc) {  if (doc.name == \"solar\") {  emit(doc._id, doc.value);  }}"
+                              },
+                              :ring => {
+                                :map => "function(doc) {  if (doc.name == \"ring\") {  emit(doc._id, doc.value);  }}"
+                              },
+                              :fridge => {
+                                :map => "function(doc) {  if (doc.name == \"fridge\") {  emit(doc._id, doc.value);  }}"
+                              },
+                              :lights => {
+                                :map => "function(doc) {  if (doc.name == \"lights\") {  emit(doc._id, doc.value);  }}"
                               }
+
                             }
+
                           })
     end
     def amphours(name,hours)
-      @sum  = 0
+      @sum   = 0
+      @name  = name
+      @hours = hours
       @from = Time.now().to_i-hours*60*60
-      @view = URI.escape("solar1/test?startkey=\"#{@from}\"")
-      p @view
+      @view = URI.escape("current/#{@name}?startkey=\"#{@from}\"")
       @data = @sensorsdb.view(@view)
-      @total_rows = @data['total_rows']
+      @rows_returned = @data['total_rows'] - @data['offset'] 
       @rows       = @data['rows']
+      #p  @rows_returned
       @rows.each() do |r|
-        p r
         @sum+=r['value']
       end
-      @ampm = @sum/@total_rows
-      @amph = @ampm/60
+      @amph = @sum/(@rows_returned/@hours)
       return @amph
     end
     def to_graphite(sensor_data)
