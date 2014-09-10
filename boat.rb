@@ -1,5 +1,6 @@
 require '/root/boatmon/sensors.rb'
 hostname = Socket.gethostname
+p hostname
 
 brain01 = {
   'description' => 'analog/i2c from brain01',
@@ -10,9 +11,6 @@ brain01 = {
   'dashboard'   => 'localhost',
   'graphite'   => '10.70.60.1',
 }
-
-p hostname
-
 
 sensors=Boattr::Sensors.new(brain01)
 
@@ -29,11 +27,11 @@ brain01_sensors =
     sensors.temperature('in','10-0008029674ee'),
     sensors.temperature('cylinder','10-000802961f0d'),
     sensors.temperature('stove','10-00080296978d'),
-    sensors.temperature('calan','28-000004ee99a8'),
+    sensors.temperature('canal','28-000004ee99a8'),
 ]
 
 
 Boattr::Data.new(brain01).to_db(brain01_sensors)
 Boattr::Data.new(brain01).to_graphite(brain01_sensors)
-#Boattr::Data.new(brain01).to_dashboard(brain01_sensors)
+
 
