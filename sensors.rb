@@ -17,12 +17,12 @@ module Boattr
     attr_reader :location, :i2cAddress, :i2cBus, :data, :basename
     def initialize(params)
       @@basename    = params['basename']
-      @i2cAddress  = params['i2cAddress']
-      @@device = ::I2C.create(params['i2cBus'])
+      @i2cAddress   = params['i2cAddress']
+      @@device      = ::I2C.create(params['i2cBus'])
       self.read()
       self.onewire()
     end
-    def read
+    def readold
       @data = []
       # read 20 bytes from slave, convert to decimals, and finaly in 10bit values.
       @adc = @@device.read(i2cAddress, 0x14, 0x00).unpack('C*').map {|e| e.to_s 10}
@@ -30,6 +30,24 @@ module Boattr
       @adc.each_slice(2) {|a| @@data << a[0].to_i*256+a[1].to_i}
       return @@data
     end
+    def read
+      @i2cIter      = 12
+      @data = Array.new(10) {Array.new }
+      @samples = []
+      @i2cIter.times do 
+        # read 20 bytes from slave, convert to decimals, and finaly in 10bit values.
+        @adc = @@device.read(i2cAddress, 0x14, 0x00).unpack('C*').map {|e| e.to_s 10}
+        sleep(0.1)
+        #slice the 20 byte array into pairs (MSB,LSB) and convert. 
+        @adc.each_slice(2) {|a| @samples << a[0].to_i*256+a[1].to_i}
+        @data.each_with_index() {|d,i| d << @samples[i]}
+      end
+      #take the average
+      @data.each_with_index() {|d,i| @@data << d.inject{|sum,x| sum + x }/@i2cIter  }
+      p @@data
+      return  @@data
+    end
+
     def voltage(name,address)
       @name    = name
       @raw     = @@data[address]
