@@ -34,17 +34,25 @@ module Boattr
       @i2cIter      = 12
       @data = Array.new(10) {Array.new }
       @samples = []
-      @i2cIter.times do 
+      @i2cIter.times do #we take @i2cIter samples
         # read 20 bytes from slave, convert to decimals, and finaly in 10bit values.
         @adc = @@device.read(i2cAddress, 0x14, 0x00).unpack('C*').map {|e| e.to_s 10}
         sleep(0.1)
-        #slice the 20 byte array into pairs (MSB,LSB) and convert. 
+        #slice the 20 byte array into pairs (MSB,LSB) and convert decimal. 
         @adc.each_slice(2) {|a| @samples << a[0].to_i*256+a[1].to_i}
+        #p @samples
         @data.each_with_index() {|d,i| d << @samples[i]}
+        @samples = []
       end
-      #take the average
-      @data.each_with_index() {|d,i| @@data << d.inject{|sum,x| sum + x }/@i2cIter  }
-      p @@data
+      #take the average (array.inject(:+) ? )
+      @data.each_with_index() do |d,i|
+        # sort and remove max and min
+        d = d.sort
+        d.pop 
+        d.shift
+        @@data << d.inject{|sum,x| sum + x }/(@i2cIter-2)
+      end
+      #p @@data
       return  @@data
     end
 
