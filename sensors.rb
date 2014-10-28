@@ -31,7 +31,7 @@ module Boattr
       return @@data
     end
     def read
-      @i2cIter      = 12
+      @i2cIter      = 16
       @data = Array.new(10) {Array.new }
       @samples = []
       @i2cIter.times do #we take @i2cIter samples
@@ -48,11 +48,12 @@ module Boattr
       @data.each_with_index() do |d,i|
         # sort and remove max and min
         d = d.sort
-        d.pop 
+        d.pop
+        d.pop
         d.shift
-        @@data << d.inject{|sum,x| sum + x }/(@i2cIter-2)
+        d.shift
+        @@data << d.inject{|sum,x| sum + x }/(@i2cIter-4)
       end
-      #p @@data
       return  @@data
     end
 
@@ -62,11 +63,16 @@ module Boattr
       @volts = @raw * 0.015357
       return { 'name' => @name, 'type' => 'volts', 'raw' => @raw, 'value' => @volts.round(3) }
     end
-    def current(name,address)
+    def current(name,address,model='acs714',type='both')
+      @supported_models = { 'acs714' => 0.066, 'acs709' => 0.028}
       @name    = name
+      @type    = type
+      @divider = @supported_models[model]
       @raw     = @@data[address]
       @volts   = (@raw*0.004887)
-      @amps    = (@volts-2.5)/0.066 
+      if type == 'both' then
+        @amps    = (@volts-2.5)/@divider
+      end
       return { 'name' => @name, 'type' => 'current', 'raw' => @raw, 'value' => @amps.round(3)} 
     end
     def onewire()
