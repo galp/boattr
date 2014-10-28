@@ -15,14 +15,14 @@ brain01 = {
 sensors=Boattr::Sensors.new(brain01)
 
 brain01_sensors =
-  [ sensors.current('solar',0),
-    sensors.current('genny',1), 
-    sensors.current('lights',2),
-    sensors.current('pumps',3),
-    sensors.current('ring',4),
-    sensors.current('fridge',5),
+  [ sensors.current('solar',0,model='acs714',type='src'), 
+    sensors.current('genny',1,model='acs709',type='src'), 
+    sensors.current('lights',2,model='acs714',type='load'),
+    #sensors.current('pumps',3),
+    sensors.current('ring',4,model='acs714',type='load'),
+    sensors.current('fridge',5,model='acs714',type='load'),
     sensors.voltage('batteries',6),
-    sensors.waterlevel('tank',7),
+    #sensors.waterlevel('tank',7),
     sensors.temperature('out','10-000802964c0d'),
     sensors.temperature('in','10-0008029674ee'),
     sensors.temperature('cylinder','10-000802961f0d'),

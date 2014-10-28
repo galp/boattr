@@ -14,8 +14,9 @@ brain01 = {
 
 
 #Boattr::Data.new(brain01).create_views('foo')
-
-p Boattr::Data.new(brain01).amphours('solar',168)
-p Boattr::Data.new(brain01).amphours('ring',168)
-p Boattr::Data.new(brain01).amphours('fridge',168)
-p Boattr::Data.new(brain01).amphours('lights',168)
+hours = 720 # 1 week 
+hours = 6
+p Boattr::Data.new(brain01).amphours('solar',hours)
+p Boattr::Data.new(brain01).amphours('ring',hours)
+p Boattr::Data.new(brain01).amphours('fridge',hours)
+p Boattr::Data.new(brain01).amphours('lights',hours)

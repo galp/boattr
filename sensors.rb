@@ -70,9 +70,13 @@ module Boattr
       @divider = @supported_models[model]
       @raw     = @@data[address]
       @volts   = (@raw*0.004887)
-      if type == 'both' then
-        @amps    = (@volts-2.5)/@divider
+      if type == 'src' and @volts < 2.5 then
+        @volts = 2.5
       end
+      if type == 'load' and @volts > 2.5 then
+        @volts = 2.5
+      end
+      @amps    = (@volts-2.5)/@divider      
       return { 'name' => @name, 'type' => 'current', 'raw' => @raw, 'value' => @amps.round(3)} 
     end
     def onewire()
