@@ -8,7 +8,7 @@ require 'couchrest'
 require 'simple-graphite'
 require 'socket'
 require 'uri'
-
+require 'httparty'
 module Boattr
   class Sensors
     @@data = []
@@ -61,7 +61,7 @@ module Boattr
       @name    = name
       @raw     = @@data[address]
       @volts = @raw * 0.015357
-      return { 'name' => @name, 'type' => 'volts', 'raw' => @raw, 'value' => @volts.round(3) }
+      return { 'name' => @name, 'type' => 'volts', 'raw' => @raw, 'value' => @volts.round(2) }
     end
     def current(name,address,model='acs714',type='both')
       @supported_models = { 'acs714' => 0.066, 'acs709' => 0.028}
@@ -77,7 +77,7 @@ module Boattr
         @volts = 2.5
       end
       @amps    = (@volts-2.5)/@divider      
-      return { 'name' => @name, 'type' => 'current', 'raw' => @raw, 'value' => @amps.round(3)} 
+      return { 'name' => @name, 'type' => 'current', 'raw' => @raw, 'value' => @amps.round(2)} 
     end
     def onewire()
       @basedir  = '/sys/bus/w1/devices/'
@@ -93,7 +93,7 @@ module Boattr
         file = File.open("#{@basedir}/#{address}/w1_slave",'r')
         if file.readline().include?('YES') then ## Is CRC valid in the first line? lets read the second and extract the temp
           @temp = file.readline().split()[-1].split('=')[-1].to_i/1000.0
-          return { 'name' => @name, 'address' => @address, 'type' => 'temp', 'value' => @temp.round(3) }
+          return { 'name' => @name, 'address' => @address, 'type' => 'temp', 'value' => @temp.round(2) }
         end
       end
     end
@@ -186,8 +186,17 @@ module Boattr
     end
     def to_dashboard(sensor_data)
       @name =  @@basename
-      HTTParty.post('http://localhost:3030/widgets/karma',
-                    :body => { auth_token: "YOUR_AUTH_TOKEN", current: 1000 }.to_json)
+      @data = sensor_data
+      @data.each() do |x|
+        if x.nil? then 
+          next
+        end
+        @name  = x['name']
+        @value = x['value']
+        @type = x['type']
+        HTTParty.post("http://localhost:3030/widgets/#{@type}#{@name}",
+                      :body => { auth_token: "YOUR_AUTH_TOKEN", current: @value }.to_json)
+      end
     end
   end
 

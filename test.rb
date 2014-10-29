@@ -1,33 +1,40 @@
-#!/usr/bin/ruby
+require '/root/boatmon/sensors.rb'
+hostname = Socket.gethostname
+puts hostname
 
-require 'time'
-require 'json'
-require './couch.rb'
+brain01 = {
+  'description' => 'analog/i2c from brain01',
+  'basename'    => 'boat',
+  'i2cAddress'  => 0x28,
+  'i2cBus'      => '/dev/i2c-1',
+  'couchdb'     => 'localhost',
+  'dashboard'   => 'localhost',
+  'graphite'    => '10.70.60.1',
+}
 
-server = Couch::Server.new("192.168.8.1", "5984")
+sensors=Boattr::Sensors.new(brain01)
 
-# doc = {"_id": now , "type" : "current", "source": "solar", "data": {"raw" : raw, "amps" : amps} }
-#puts json
-
-epoch = Time.now.to_i
-now   = Time.new
-fromtime = now - (60*60*6)
-puts "#{fromtime} #{now}"
-puts "#{fromtime.to_i} #{now.to_i}"
-view = "/sensors/_design/amps1/_view/amps1?startkey=\"#{fromtime.to_i}\"&endkey=\"#{now.to_i}\""
-minutes=(now.to_i-fromtime.to_i)/60
-
-res = server.get(view)
-json = res.body
-data = JSON.parse(json)
-a=0
-data['rows'].each do |item|
-  a = item['value']+a
-end
-ampminutes=a/minutes
-amphours=ampminutes/60
-
-puts a,minutes,ampminutes, amphours
+#p sensors.read()
+brain01_sensors =
+  [ sensors.current('solar',0),
+    sensors.current('genny',1), 
+    sensors.current('lights',2),
+    #sensors.current('pumps',3),
+    sensors.current('ring',4),
+    sensors.current('fridge',5),
+    sensors.voltage('batteries',6),
+    #sensors.waterlevel('tank',7),
+    sensors.temperature('out','10-000802964c0d'),
+    sensors.temperature('in','10-0008029674ee'),
+    sensors.temperature('cylinder','10-000802961f0d'),
+    sensors.temperature('stove','10-00080296978d'),
+    sensors.temperature('canal','28-000004ee99a8'),
+]
 
 
-#amps = data['rows'].map { |rd| rows.new(rd['_id'], rd['amps']) }
+#Boattr::Data.new(brain01).to_db(brain01_sensors)
+#Boattr::Data.new(brain01).to_graphite(brain01_sensors)
+#Boattr::Data.new(brain01).to_dashboard([sensors.voltage('batteries',6), sensors.temperature('in','10-0008029674ee'), sensors.temperature('out','10-000802964c0d')])
+
+
+Boattr::Data.new(brain01).to_dashboard(brain01_sensors)

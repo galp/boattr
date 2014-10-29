@@ -33,5 +33,5 @@ brain01_sensors =
 
 Boattr::Data.new(brain01).to_db(brain01_sensors)
 Boattr::Data.new(brain01).to_graphite(brain01_sensors)
-
+Boattr::Data.new(brain01).to_dashboard(brain01_sensors)
 
