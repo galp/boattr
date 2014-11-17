@@ -9,6 +9,8 @@ require 'simple-graphite'
 require 'socket'
 require 'uri'
 require 'httparty'
+require 'nokogiri'
+
 module Boattr
   class Sensors
     @@data = []
@@ -127,26 +129,23 @@ module Boattr
       end
     end
     def create_views(sensor_data)
-      @sensorsdb.save_doc(
-                          {
-                            "_id" => "_design/current", 
+      @data  = sensor_data
+      @data.each() do |x|
+        if x.nil? then 
+          next
+        end
+        @name  = x['name']
+        @type  = x['type']
+        @sensorsdb.save_doc(
+                            {
+                              "_id" => "_design/#{@type}", 
                             :views => {
-                              :solar => {
-                                :map => "function(doc) {  if (doc.name == \"solar\") {  emit(doc._id, doc.value);  }}"
-                              },
-                              :ring => {
-                                :map => "function(doc) {  if (doc.name == \"ring\") {  emit(doc._id, doc.value);  }}"
-                              },
-                              :fridge => {
-                                :map => "function(doc) {  if (doc.name == \"fridge\") {  emit(doc._id, doc.value);  }}"
-                              },
-                              :lights => {
-                                :map => "function(doc) {  if (doc.name == \"lights\") {  emit(doc._id, doc.value);  }}"
+                                "#{@name}".to_sym => {
+                                :map => "function(doc) {  if (doc.name == \"#{@name}\") {  emit(doc._id, doc.value);  }}"
+                                },
                               }
-
-                            }
-
-                          })
+                            })
+      end
     end
     def amphours(name,hours)
       @sum   = 0
@@ -198,6 +197,16 @@ module Boattr
                       :body => { auth_token: "YOUR_AUTH_TOKEN", current: @value }.to_json)
       end
     end
+    def getRemainingData()
+      @page = Nokogiri::HTML(open("http://add-on.ee.co.uk/status")) 
+      @data = @page.css('span')[0].text
+      @unit = @data.slice(-2..-1)
+      if @unit == 'GB'
+        @bytes = @data.slice(0..-3).to_f*1000
+      else
+        @bytes = @data.slice(0..-3).to_f
+      end
+      return { 'name' => @name, 'type' => 'data', 'value' => @butes.round(2) }
+    end
   end
-
 end
