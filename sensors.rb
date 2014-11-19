@@ -24,14 +24,6 @@ module Boattr
       self.read()
       self.onewire()
     end
-    def readold
-      @data = []
-      # read 20 bytes from slave, convert to decimals, and finaly in 10bit values.
-      @adc = @@device.read(i2cAddress, 0x14, 0x00).unpack('C*').map {|e| e.to_s 10}
-      #slice the 20 byte array into pairs (MSB,LSB) and convert. 
-      @adc.each_slice(2) {|a| @@data << a[0].to_i*256+a[1].to_i}
-      return @@data
-    end
     def read
       @i2cIter      = 16
       @data = Array.new(10) {Array.new }
