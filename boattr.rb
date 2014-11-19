@@ -100,14 +100,21 @@ module Boattr
       return { 'name' => @name, 'type' => 'water', 'value' => @raw }
     end
   end
+
   class Data
     def initialize(params)
-      @graphite = params['graphite']
-      @couchdb  = params['couchdb']
-      @@basename = params['basename']
-      @g     = Graphite.new({:host => "#{@graphite}", :port => 2003})
-      @sensorsdb = CouchRest.database!("http://#{@couchdb}:5984/#{@@basename}-sensors")
-      @statsdb   = CouchRest.database!("http://#{@couchdb}:5984/#{@@basename}-stats")
+      @graphite    = params['graphite']
+      @couchdb     = params['couchdb']
+      @@basename   = params['basename']
+      unless @graphite.nil? || @graphite.empty? then
+        @g         = Graphite.new({:host => "#{@graphite}", :port => 2003})        
+
+      end
+      unless @couchdb.nil? || @couchdb.empty? then
+        @sensorsdb = CouchRest.database!("http://#{@couchdb}:5984/#{@@basename}-sensors")
+        @statsdb   = CouchRest.database!("http://#{@couchdb}:5984/#{@@basename}-stats")
+        p "not nil"
+      end
     end
     def to_db(sensor_data)
       @data  = sensor_data
@@ -153,7 +160,7 @@ module Boattr
         @sum+=r['value']
       end
       @amph = @sum/(@rows_returned/@hours)
-      return @amph
+      return { 'name' => @name,  'value' => @amph.round(2)}
     end
     def to_graphite(sensor_data)
       @base  = @@basename
@@ -189,7 +196,7 @@ module Boattr
                       :body => { auth_token: "YOUR_AUTH_TOKEN", current: @value }.to_json)
       end
     end
-    def getRemainingData()
+    def get_remaining_data()
       @page = Nokogiri::HTML(open("http://add-on.ee.co.uk/status"))
       @data = @page.css('span')[0].text
       @unit = @data.slice(-2..-1)
