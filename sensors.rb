@@ -14,7 +14,7 @@ require 'nokogiri'
 module Boattr
   class Sensors
     @@data = []
-    @@device 
+    @@device
     @@OWdevices = []
     attr_reader :location, :i2cAddress, :i2cBus, :data, :basename
     def initialize(params)
@@ -32,7 +32,7 @@ module Boattr
         # read 20 bytes from slave, convert to decimals, and finaly in 10bit values.
         @adc = @@device.read(i2cAddress, 0x14, 0x00).unpack('C*').map {|e| e.to_s 10}
         sleep(0.1)
-        #slice the 20 byte array into pairs (MSB,LSB) and convert decimal. 
+        #slice the 20 byte array into pairs (MSB,LSB) and convert decimal.
         @adc.each_slice(2) {|a| @samples << a[0].to_i*256+a[1].to_i}
         #p @samples
         @data.each_with_index() {|d,i| d << @samples[i]}
@@ -64,14 +64,14 @@ module Boattr
       @divider = @supported_models[model]
       @raw     = @@data[address]
       @volts   = (@raw*0.004887)
-      if type == 'src' and @volts < 2.5 then
+      if type == 'src' and @volts < 2.5 then # a source should not show negative values.
         @volts = 2.5
       end
-      if type == 'load' and @volts > 2.5 then
+      if type == 'load' and @volts > 2.5 then # a load should not show possitive values 
         @volts = 2.5
-      end
-      @amps    = (@volts-2.5)/@divider      
-      return { 'name' => @name, 'type' => 'current', 'raw' => @raw, 'value' => @amps.round(2)} 
+1      end
+      @amps    = (@volts-2.5)/@divider
+      return { 'name' => @name, 'type' => 'current', 'raw' => @raw, 'value' => @amps.round(2)}
     end
     def onewire()
       @basedir  = '/sys/bus/w1/devices/'
@@ -100,7 +100,7 @@ module Boattr
       return { 'name' => @name, 'type' => 'water', 'value' => @raw }
     end
   end
-  class Data  
+  class Data
     def initialize(params)
       @graphite = params['graphite']
       @couchdb  = params['couchdb']
@@ -112,7 +112,7 @@ module Boattr
     def to_db(sensor_data)
       @data  = sensor_data
       @data.each() do |x|
-        if x.nil? then 
+        if x.nil? then
           next
         end
         p x
@@ -123,14 +123,14 @@ module Boattr
     def create_views(sensor_data)
       @data  = sensor_data
       @data.each() do |x|
-        if x.nil? then 
+        if x.nil? then
           next
         end
         @name  = x['name']
         @type  = x['type']
         @sensorsdb.save_doc(
                             {
-                              "_id" => "_design/#{@type}", 
+                              "_id" => "_design/#{@type}",
                             :views => {
                                 "#{@name}".to_sym => {
                                 :map => "function(doc) {  if (doc.name == \"#{@name}\") {  emit(doc._id, doc.value);  }}"
@@ -146,7 +146,7 @@ module Boattr
       @from = Time.now().to_i-hours*60*60
       @view = URI.escape("current/#{@name}?startkey=\"#{@from}\"")
       @data = @sensorsdb.view(@view)
-      @rows_returned = @data['total_rows'] - @data['offset'] 
+      @rows_returned = @data['total_rows'] - @data['offset']
       @rows       = @data['rows']
       #p  @rows_returned
       @rows.each() do |r|
@@ -160,7 +160,7 @@ module Boattr
       @data  = sensor_data
       #p "#{@base}.#{@type}.#{@name} #{@value} #{@g.time_now}"
       @data.each() do |x|
-        if x.nil? then 
+        if x.nil? then
           next
         end
         @type  = x['type']
@@ -179,7 +179,7 @@ module Boattr
       @name =  @@basename
       @data = sensor_data
       @data.each() do |x|
-        if x.nil? then 
+        if x.nil? then
           next
         end
         @name  = x['name']
@@ -190,7 +190,7 @@ module Boattr
       end
     end
     def getRemainingData()
-      @page = Nokogiri::HTML(open("http://add-on.ee.co.uk/status")) 
+      @page = Nokogiri::HTML(open("http://add-on.ee.co.uk/status"))
       @data = @page.css('span')[0].text
       @unit = @data.slice(-2..-1)
       if @unit == 'GB'
