@@ -57,21 +57,21 @@ module Boattr
       @volts = @raw * 0.015357
       return { 'name' => @name, 'type' => 'volts', 'raw' => @raw, 'value' => @volts.round(2) }
     end
-    def current(name,address,model='acs714',type='both')
+    def current(name,address,model='acs714',mode='both')
       @supported_models = { 'acs714' => 0.066, 'acs709' => 0.028}
       @name    = name
-      @type    = type
+      @mode    = mode
       @divider = @supported_models[model]
       @raw     = @@data[address]
       @volts   = (@raw*0.004887)
-      if type == 'src' and @volts < 2.5 then # a source should not show negative values.
+      if mode == 'src' and @volts < 2.5 then # a source should not show negative values.
         @volts = 2.5
       end
-      if type == 'load' and @volts > 2.5 then # a load should not show possitive values 
+      if mode == 'load' and @volts > 2.5 then # a load should not show possitive values 
         @volts = 2.5
 1      end
       @amps    = (@volts-2.5)/@divider
-      return { 'name' => @name, 'type' => 'current', 'raw' => @raw, 'value' => @amps.round(2)}
+      return { 'name' => @name, 'type' => 'current', 'mode' => @mode, 'raw' => @raw, 'value' => @amps.round(2)}
     end
     def onewire()
       @basedir  = '/sys/bus/w1/devices/'
