@@ -121,7 +121,7 @@ module Boattr
         if x.nil? then
           next
         end
-        p x
+        p x 
         @doc ={ "_id" => now() }.merge x
         @sensorsdb.save_doc(@doc)
       end
@@ -184,12 +184,11 @@ module Boattr
     def to_dashboard(sensor_data)
       #@name =  @@basename
       @data = sensor_data
-      p @data
       @data.each() do |x|
         if x.nil? then
           next
         end
-        p x
+
         @type  = x['type']        
         @name  = x['name']
         @value = x['value']        
