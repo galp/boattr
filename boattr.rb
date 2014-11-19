@@ -7,7 +7,7 @@ require "i2c/backends/i2c-dev"
 require 'couchrest'
 require 'simple-graphite'
 require 'socket'
-require 'uri'
+require 'open-uri'
 require 'httparty'
 require 'nokogiri'
 
@@ -113,7 +113,6 @@ module Boattr
       unless @couchdb.nil? || @couchdb.empty? then
         @sensorsdb = CouchRest.database!("http://#{@couchdb}:5984/#{@@basename}-sensors")
         @statsdb   = CouchRest.database!("http://#{@couchdb}:5984/#{@@basename}-stats")
-        p "not nil"
       end
     end
     def to_db(sensor_data)
@@ -183,29 +182,35 @@ module Boattr
       return Time.now.to_f.round(2).to_s
     end
     def to_dashboard(sensor_data)
-      @name =  @@basename
+      #@name =  @@basename
       @data = sensor_data
+      p @data
       @data.each() do |x|
         if x.nil? then
           next
         end
+        p x
+        @type  = x['type']        
         @name  = x['name']
-        @value = x['value']
-        @type = x['type']
-        HTTParty.post("http://localhost:3030/widgets/#{@type}#{@name}",
+        @value = x['value']        
+        HTTParty.post("http://192.168.8.1:3030/widgets/#{@type}#{@name}",
                       :body => { auth_token: "YOUR_AUTH_TOKEN", current: @value }.to_json)
       end
     end
-    def get_remaining_data()
+    def get_remaining_data(name)
+      @name = name  
+      @butes = 0
       @page = Nokogiri::HTML(open("http://add-on.ee.co.uk/status"))
       @data = @page.css('span')[0].text
+      p @data
       @unit = @data.slice(-2..-1)
       if @unit == 'GB'
-        @bytes = @data.slice(0..-3).to_f*1000
-      else
         @bytes = @data.slice(0..-3).to_f
+        p @bytes
+      else
+        @bytes = @data.slice(0..-3).to_f/1000.0
       end
-      return { 'name' => @name, 'type' => 'data', 'value' => @butes.round(2) }
+      return { 'name' => @name, 'type' => 'data', 'value' => @bytes }
     end
   end
 end
