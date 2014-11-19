@@ -1,4 +1,4 @@
-require '/root/boatmon/sensors.rb'
+require '/home/ag/dev/boatmon/boattr.rb'
 hostname = Socket.gethostname
 puts hostname
 
@@ -37,4 +37,6 @@ brain01_sensors =
 #Boattr::Data.new(brain01).to_dashboard([sensors.voltage('batteries',6), sensors.temperature('in','10-0008029674ee'), sensors.temperature('out','10-000802964c0d')])
 
 
-Boattr::Data.new(brain01).to_dashboard(brain01_sensors)
+#Boattr::Data.new(brain01).to_dashboard(brain01_sensors)
+dataAllowance = Boattr::Data.new(brain01).getRemainingData() 
+Boattr::Data.new(brain01).to_dashboard(dataAllowance)

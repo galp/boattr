@@ -1,4 +1,4 @@
-require '/root/boatmon/sensors.rb'
+require '/root/boatmon/boattr.rb'
 hostname = Socket.gethostname
 
 brain02 = {
