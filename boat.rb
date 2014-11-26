@@ -13,7 +13,7 @@ brain01 = {
 }
 
 sensors=Boattr::Sensors.new(brain01)
-
+dataAllowance = Boattr::Data.new(brain01).get_remaining_data('ee') 
 brain01_sensors =
   [ sensors.current('solar',0,model='acs714',type='src'), 
     sensors.current('genny',1,model='acs709',type='src'), 
@@ -28,11 +28,11 @@ brain01_sensors =
     sensors.temperature('cylinder','10-000802961f0d'),
     sensors.temperature('stove','10-00080296978d'),
     sensors.temperature('canal','28-000004ee99a8'),
+    dataAllowance,
 ]
 
 
 Boattr::Data.new(brain01).to_db(brain01_sensors)
 Boattr::Data.new(brain01).to_graphite(brain01_sensors)
 Boattr::Data.new(brain01).to_dashboard(brain01_sensors)
-#dataAllowance = Boattr::Data.new(brain01).getRemainingData() 
-#Boattr::Data.new(brain01).to_dashboard(dataAllowance)
+
