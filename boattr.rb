@@ -67,7 +67,7 @@ module Boattr
       if mode == 'src' and @volts < 2.5 then # a source should not show negative values.
         @volts = 2.5
       end
-      if mode == 'load' and @volts > 2.5 then # a load should not show possitive values 
+      if mode == 'load' and @volts > 2.5 then # a load should not show possitive values
         @volts = 2.5
 1      end
       @amps    = (@volts-2.5)/@divider
@@ -107,7 +107,7 @@ module Boattr
       @couchdb     = params['couchdb']
       @@basename   = params['basename']
       unless @graphite.nil? || @graphite.empty? then
-        @g         = Graphite.new({:host => "#{@graphite}", :port => 2003})        
+        @g         = Graphite.new({:host => "#{@graphite}", :port => 2003})
 
       end
       unless @couchdb.nil? || @couchdb.empty? then
@@ -121,7 +121,7 @@ module Boattr
         if x.nil? then
           next
         end
-        p x 
+        p x
         @doc ={ "_id" => now() }.merge x
         @sensorsdb.save_doc(@doc)
       end
@@ -141,6 +141,18 @@ module Boattr
                                 "#{@name}".to_sym => {
                                 :map => "function(doc) {  if (doc.name == \"#{@name}\") {  emit(doc._id, doc.value);  }}"
                                 },
+                                "ampMinutes".to_sym => {
+                                  :map => "function(doc) {  if (doc.type == \"#{@type}\") {  emit(doc.name, doc.value);  }}",
+                                  :reduce => "function(keys, values, rereduce) {\n  var length = values.length\n  return sum(values)/length\n}"
+                                },
+                                "ampMinutesLoad".to_sym => {
+                                  :map => "function(doc) {  if (doc.type == \"#{@type}\" && doc.mode == \"load\") {  emit(doc.name, doc.value);  }}",
+                                  :reduce => "function(keys, values, rereduce) {\n  var length = values.length\n  return sum(values)/length\n}"
+                                },
+                                "ampMinutesSrc".to_sym => {
+                                  :map => "function(doc) {  if (doc.type == \"#{@type}\" && doc.mode == \"src\") {  emit(doc.name, doc.value);  }}",
+                                  :reduce => "function(keys, values, rereduce) {\n  var length = values.length\n  return sum(values)/length\n}"
+                                }
                               }
                             })
       end
@@ -189,7 +201,7 @@ module Boattr
           next
         end
 
-        @type  = x['type']        
+        @type  = x['type']
         @name  = x['name']
         @value = x['value']        
         HTTParty.post("http://192.168.8.1:3030/widgets/#{@type}#{@name}",
@@ -197,7 +209,7 @@ module Boattr
       end
     end
     def get_remaining_data(name)
-      @name = name  
+      @name = name
       @butes = 0
       @page = Nokogiri::HTML(open("http://add-on.ee.co.uk/status"))
       @data = @page.css('span')[0].text
