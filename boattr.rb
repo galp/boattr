@@ -193,7 +193,7 @@ module Boattr
         @name  = x['name']
         @value = x['value']        
         HTTParty.post("http://192.168.8.1:3030/widgets/#{@type}#{@name}",
-                      :body => { auth_token: "YOUR_AUTH_TOKEN", current: @value }.to_json)
+                      :body => { auth_token: "YOUR_AUTH_TOKEN", current: @value, moreinfo: @name }.to_json)
       end
     end
     def get_remaining_data(name)
