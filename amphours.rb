@@ -6,8 +6,9 @@ brain01 = {
   'i2cAddress'  => 0x28,
   'i2cBus'      => '/dev/i2c-1',
   'couchdb'     => '192.168.8.1',
-  'dashboard'   => 'localhost',
-  'graphite'   => '10.70.60.1',
+  'dashboard'   => '192.168.8.1',
+  'graphite'    => '10.70.60.1',
+  'dash_auth'   => 'YOUR_AUTH_TOKEN',
 }
 
 

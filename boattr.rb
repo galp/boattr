@@ -105,7 +105,10 @@ module Boattr
     def initialize(params)
       @graphite    = params['graphite']
       @couchdb     = params['couchdb']
+      @dashboard   = params['dashboard']
+      @dash_auth   = params['dash_auth']
       @@basename   = params['basename']
+
       unless @graphite.nil? || @graphite.empty? then
         @g         = Graphite.new({:host => "#{@graphite}", :port => 2003})
 
@@ -227,7 +230,6 @@ module Boattr
       return Time.now.to_f.round(2).to_s
     end
     def to_dashboard(sensor_data)
-      #@name =  @@basename
       @data = sensor_data
       @data.each() do |x|
         if x.nil? then
@@ -236,29 +238,27 @@ module Boattr
         @type  = x['type']
         @name  = x['name']
         @value = x['value']
-        HTTParty.post("http://192.168.8.1:3030/widgets/#{@type}#{@name}",
-                      :body => { auth_token: "YOUR_AUTH_TOKEN", current: @value, moreinfo: @type, title: @name }.to_json)
+        HTTParty.post("http://#{@dashboard}:3030/widgets/#{@type}#{@name}",
+                      :body => { auth_token: "#{@dash_auth}", current: @value, moreinfo: @type, title: @name }.to_json)
       end
     end
 
-    def new_to_dashboard(data,widget)
-      @data   = data
+    def new_to_dashboard(sensor_data,widget)
+      @data   = sensor_data
       @widget = widget
       @items  = []
       @data.each() do |x|
         if x.nil? then
           next
         end
-        p x['hours']
         @name  = x['name']
         @value = x['value']
         @hours = x['hours']
-        @items << {:label=>@name, :value=> @value}
         @type  = x['type']
+        @items << {:label => @name, :value => @value}
       end
-      p @hours
-      HTTParty.post("http://192.168.8.1:3030/widgets/#{@widget}",
-                    :body => { auth_token: "YOUR_AUTH_TOKEN", items: @items , moreinfo: "last #{@hours} hours", title: @widget }.to_json)
+      HTTParty.post("http://#{@dashboard}:3030/widgets/#{@widget}",
+                    :body => { auth_token: "#{@dash_auth}", items: @items , moreinfo: "last #{@hours} hours", title: @widget }.to_json)
     end
 
     def get_remaining_data(name)
