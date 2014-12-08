@@ -11,30 +11,23 @@ brain01 = {
   'dash_auth'   => 'YOUR_AUTH_TOKEN',
 }
 
+sensor_data = [{"name"=>"solar", "type"=>"current", "mode"=>"src", "raw"=>513, "value"=>0.11},
+               {"name"=>"lights", "type"=>"current", "mode"=>"load", "raw"=>512, "value"=>0.0},
+               {"name"=>"ring", "type"=>"current", "mode"=>"load", "raw"=>508, "value"=>-0.26},
+               {"name"=>"out", "address"=>"10-000802964c0d", "type"=>"temp", "value"=>2.31},
+               {"name"=>"in", "address"=>"10-0008029674ee", "type"=>"temp", "value"=>16.81},
+               {"name"=>"stove", "address"=>"10-00080296978d", "type"=>"temp", "value"=>46.31},
+               {"name"=>"cylinder", "address"=>"10-00080296978d", "type"=>"temp", "value"=>46.31},
+              ]
 
-current = [{"name"=>"solar", "type"=>"current", "mode"=>"src", "raw"=>513, "value"=>0.11},
-           {"name"=>"lights", "type"=>"current", "mode"=>"load", "raw"=>512, "value"=>0.0},
-           {"name"=>"ring", "type"=>"current", "mode"=>"load", "raw"=>508, "value"=>-0.26}]
+@week  = 720 # 1 week 
+@hours = 24
+a = Boattr::Data.new(brain01)
+
+@boat_amph = a.amphours(sensor_data,@hours)
+@balance  = a.amphourBalance(@boat_amph)
+@balance.concat(@boat_amph)
+
+a.new_to_dashboard(@balance,'amphours')
 
 
-
-#Boattr::Data.new(brain01).create_views('foo')
-hours = 720 # 1 week 
-hours = 24
-amphours =  Boattr::Data.new(brain01).amphours(current,hours)
-@loads,@sources = 0,0
-amphours.each() do |x|
-  if x['mode'] == "src" then
-    @sources+= x['value']
-  end
-  if x['mode'] == "load" then
-    @loads+= x['value']
-  end
-end
-#p amphours
-src = {"name" => "sources", "type" => "amphours", "hours" => @hours, "value" => @sources.round(2)}
-load = {"name" => "loads", "type" => "amphours", "hours" => @hours, "value" => @loads.round(2)}
-#amphours << src
-#amphours << load
-#Boattr::Data.new(brain01).new_to_dashboard([src,load],'amphours')
-Boattr::Data.new(brain01).new_to_dashboard(amphours,'amphours')

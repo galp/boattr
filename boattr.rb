@@ -195,18 +195,31 @@ module Boattr
         if x.nil? or x['type'] != "current" then
           next
         end
-        @name  = x['name']
-        @type  = x['type']
-        @mode  = x['mode']
-        @view = URI.escape("current/#{@name}?startkey=\"#{@from}\"")
+        @name   = x['name']
+        @type   = x['type']
+        @mode   = x['mode']
+        @view   = URI.escape("current/#{@name}?startkey=\"#{@from}\"")
         @result =  @sensorsdb.view(@view)['rows'][0]['value']
-        @sum   = @result['sum']
-        @count = @result['count']
-        @amph = @sum/(@hours*60/@hours) #is this correct?
-        @foo  = { 'name' => @name,  'type' => 'amphours', 'mode' => @mode, 'hours' => @hours, 'value' => @amph.round(2)}
-        @merged << @foo
+        @sum    = @result['sum']
+        @count  = @result['count']
+        @amph   = @sum/(@hours*60/@hours) #is this correct?
+        @sensor = { 'name' => @name,  'type' => 'amphours', 'mode' => @mode, 'hours' => @hours, 'value' => @amph.round(2)}
+        @merged << @sensor
       end
       return @merged
+    end
+    def amphourBalance(amphours)
+      @loads,@sources = 0,0
+      amphours.each() do |x|
+        p x
+        if x['type'] == "amphours" &&  x['mode'] == "src" then
+          @sources+= x['value']
+        end
+        if x['type'] == "amphours" && x['mode'] == "load" then
+          @loads+= x['value']
+        end
+      end
+      return [{"name" => "sources", "type" => "amphours", "hours" => @hours, "value" => @sources.round(2)},{"name" => "loads", "type" => "amphours", "hours" => @hours, "value" => @loads.round(2)} ]
     end
 
     def to_graphite(sensor_data)
