@@ -69,7 +69,7 @@ module Boattr
       end
       if mode == 'load' and @volts > 2.5 then # a load should not show possitive values
         @volts = 2.5
-1      end
+      end
       @amps    = (@volts-2.5)/@divider
       return { 'name' => @name, 'type' => 'current', 'mode' => @mode, 'raw' => @raw, 'value' => @amps.round(2)}
     end
@@ -105,7 +105,10 @@ module Boattr
     def initialize(params)
       @graphite    = params['graphite']
       @couchdb     = params['couchdb']
+      @dashboard   = params['dashboard']
+      @dash_auth   = params['dash_auth']
       @@basename   = params['basename']
+
       unless @graphite.nil? || @graphite.empty? then
         @g         = Graphite.new({:host => "#{@graphite}", :port => 2003})
 
@@ -123,23 +126,48 @@ module Boattr
         end
         p x
         @doc ={ "_id" => now() }.merge x
-        @sensorsdb.save_doc(@doc)
+        @@sensorsdb.save_doc(@doc)
       end
     end
     def create_views(sensor_data)
-      @data  = sensor_data
+      #at this point this only creates  views of the same type, in one design doc.
+      @data       = sensor_data
+      @views      = {}
       @data.each() do |x|
         if x.nil? then
           next
         end
         @name  = x['name']
         @type  = x['type']
-        @sensorsdb.save_doc(
+        @view  = { "#{@name}".to_sym => {
+            :map    => "function(doc) {  if (doc.name == \"#{@name}\" && doc.type == \"#{@type}\" ) {  emit(doc._id, doc.value);  }}",
+            :reduce => "_stats" }
+        }
+        @views.merge!(@view)
+      end
+      p @views
+      @sensorsdb.save_doc(
+                            {
+                              "_id" => "_design/#{@type}",
+                              :language => "javascript",
+                              :views    =>  @views
+                            })
+    end
+    def views(sensor_data)
+      @data  = sensor_data
+      @data.each() do |x|
+        if x.nil? or x['type'] != "current" then
+          next
+        end
+        @name  = x['name']
+        @type  = x['type']
+        @mode  = x['mode']
+        @@sensorsdb.save_doc(
                             {
                               "_id" => "_design/#{@type}",
                             :views => {
                                 "#{@name}".to_sym => {
-                                :map => "function(doc) {  if (doc.name == \"#{@name}\") {  emit(doc._id, doc.value);  }}"
+                                  :map => "function(doc) {  if (doc.name == \"#{@name}\") {  emit(doc._id, doc.value);  }}"
                                 },
                                 "ampMinutes".to_sym => {
                                   :map => "function(doc) {  if (doc.type == \"#{@type}\") {  emit(doc.name, doc.value);  }}",
@@ -152,27 +180,48 @@ module Boattr
                                 "ampMinutesSrc".to_sym => {
                                   :map => "function(doc) {  if (doc.type == \"#{@type}\" && doc.mode == \"src\") {  emit(doc.name, doc.value);  }}",
                                   :reduce => "function(keys, values, rereduce) {\n  var length = values.length\n  return sum(values)/length\n}"
-                                }
+                                },
+
                               }
                             })
       end
     end
-    def amphours(name,hours)
-      @sum   = 0
-      @name  = name
+    def amphours(sensor_data,hours=12)
+      @data  = sensor_data
       @hours = hours
-      @from = Time.now().to_i-hours*60*60
-      @view = URI.escape("current/#{@name}?startkey=\"#{@from}\"")
-      @data = @sensorsdb.view(@view)
-      @rows_returned = @data['total_rows'] - @data['offset']
-      @rows       = @data['rows']
-      #p  @rows_returned
-      @rows.each() do |r|
-        @sum+=r['value']
+      @from = Time.now().to_i-@hours*60*60
+      @merged = []
+      @data.each() do |x|
+        if x.nil? or x['type'] != "current" then
+          next
+        end
+        @name   = x['name']
+        @type   = x['type']
+        @mode   = x['mode']
+        @view   = URI.escape("current/#{@name}?startkey=\"#{@from}\"")
+        @result =  @sensorsdb.view(@view)['rows'][0]['value']
+        @sum    = @result['sum']
+        @count  = @result['count']
+        @amph   = @sum/(@hours*60/@hours) #is this correct?
+        @sensor = { 'name' => @name,  'type' => 'amphours', 'mode' => @mode, 'hours' => @hours, 'value' => @amph.round(2)}
+        @merged << @sensor
       end
-      @amph = @sum/(@rows_returned/@hours)
-      return { 'name' => @name,  'value' => @amph.round(2)}
+      return @merged
     end
+    def amphourBalance(amphours)
+      @loads,@sources = 0,0
+      amphours.each() do |x|
+        p x
+        if x['type'] == "amphours" &&  x['mode'] == "src" then
+          @sources+= x['value']
+        end
+        if x['type'] == "amphours" && x['mode'] == "load" then
+          @loads+= x['value']
+        end
+      end
+      return [{"name" => "sources", "type" => "amphours", "hours" => @hours, "value" => @sources.round(2)},{"name" => "loads", "type" => "amphours", "hours" => @hours, "value" => @loads.round(2)} ]
+    end
+
     def to_graphite(sensor_data)
       @base  = @@basename
       @data  = sensor_data
@@ -194,30 +243,49 @@ module Boattr
       return Time.now.to_f.round(2).to_s
     end
     def to_dashboard(sensor_data)
-      #@name =  @@basename
       @data = sensor_data
       @data.each() do |x|
         if x.nil? then
           next
         end
-
         @type  = x['type']
         @name  = x['name']
-        @value = x['value']        
-        HTTParty.post("http://192.168.8.1:3030/widgets/#{@type}#{@name}",
-                      :body => { auth_token: "YOUR_AUTH_TOKEN", current: @value, moreinfo: @type, title: @name }.to_json)
+        @value = x['value']
+        HTTParty.post("http://#{@dashboard}:3030/widgets/#{@type}#{@name}",
+                      :body => { auth_token: "#{@dash_auth}", current: @value, moreinfo: @type, title: @name }.to_json)
       end
     end
+
+<<<<<<< HEAD
+        @type  = x['type']
+=======
+    def new_to_dashboard(sensor_data,widget)
+      @data   = sensor_data
+      @widget = widget
+      @items  = []
+      @data.each() do |x|
+        if x.nil? then
+          next
+        end
+>>>>>>> 889233e90c747b460b3d53c5f17487c323fb0ad2
+        @name  = x['name']
+        @value = x['value']
+        @hours = x['hours']
+        @type  = x['type']
+        @items << {:label => @name, :value => @value}
+      end
+      HTTParty.post("http://#{@dashboard}:3030/widgets/#{@widget}",
+                    :body => { auth_token: "#{@dash_auth}", items: @items , moreinfo: "last #{@hours} hours", title: @widget }.to_json)
+    end
+
     def get_remaining_data(name)
       @name = name
       @butes = 0
       @page = Nokogiri::HTML(open("http://add-on.ee.co.uk/status"))
       @data = @page.css('span')[0].text
-      p @data
       @unit = @data.slice(-2..-1)
       if @unit == 'GB'
         @bytes = @data.slice(0..-3).to_f
-        p @bytes
       else
         @bytes = @data.slice(0..-3).to_f/1000.0
       end
