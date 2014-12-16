@@ -4,6 +4,7 @@ require 'time'
 # need 'i2c' gem installed
 require "i2c/i2c"
 require "i2c/backends/i2c-dev"
+require 'gpio'
 require 'couchrest'
 require 'simple-graphite'
 require 'socket'
@@ -255,10 +256,6 @@ module Boattr
                       :body => { auth_token: "#{@dash_auth}", current: @value, moreinfo: @type, title: @name }.to_json)
       end
     end
-
-<<<<<<< HEAD
-        @type  = x['type']
-=======
     def new_to_dashboard(sensor_data,widget)
       @data   = sensor_data
       @widget = widget
@@ -267,7 +264,6 @@ module Boattr
         if x.nil? then
           next
         end
->>>>>>> 889233e90c747b460b3d53c5f17487c323fb0ad2
         @name  = x['name']
         @value = x['value']
         @hours = x['hours']
