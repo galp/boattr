@@ -3,14 +3,15 @@ hostname = Socket.gethostname
 p hostname
 
 brain01 = {
-  'description' => 'analog/i2c from brain01',
-  'basename'    => 'boat',
-  'i2cAddress'  => 0x28,
-  'i2cBus'      => '/dev/i2c-1',
-  'couchdb'     => 'localhost',
-  'dashboard'   => 'localhost',
-  'graphite'   => '10.70.60.1',
-  'dash_auth'   => 'YOUR_AUTH_TOKEN',
+  'description'   => 'analog/i2c from brain01',
+  'basename'      => 'boat',
+  'i2cAdcAddress' => 0x28,
+  'i2cBarometer'  => 0x77,
+  'i2cBus'        => '/dev/i2c-1',
+  'couchdb'       => 'localhost',
+  'dashboard'     => 'localhost',
+  'graphite'      => '10.70.60.1',
+  'dash_auth'     => 'YOUR_AUTH_TOKEN',
 }
 
 sensors=Boattr::Sensors.new(brain01)
@@ -24,10 +25,13 @@ dataAllowance = Boattr::Data.new(brain01).get_remaining_data('ee')
                    sensors.current('ring',4,model='acs714',type='load'),
                    sensors.current('fridge',5,model='acs714',type='load'),
                   ]
+@cylinder_temp = sensors.temperature('cylinder','10-000802961f0d')
+@stove_temp    = sensors.temperature('stove','10-00080296978d')
+
 @temp_sensors = [ sensors.temperature('in','10-0008029674ee'),
                   sensors.temperature('out','10-000802964c0d'),
-                  sensors.temperature('cylinder','10-000802961f0d'),
-                  sensors.temperature('stove','10-00080296978d'),
+                  @cylinder_temp,
+                  @stove_temp,
                   sensors.temperature('canal','28-000004ee99a8'), 
                   sensors.temperature('bath','28-000005661bfa'), 
                   #sensors.temperature('one','28-0000056b2c1a'), 
@@ -48,6 +52,7 @@ Boattr::Data.new(brain01).to_db(@brain01_sensors)
 Boattr::Data.new(brain01).to_graphite(@brain01_sensors)
 
 @hours = 24
+
 dashing = Boattr::Data.new(brain01)
 dashing.to_dashboard(@brain01_sensors)
 
@@ -61,3 +66,5 @@ dashing.to_dashboard(@brain01_sensors)
 #Boattr::Data.new(brain01).new_to_dashboard(@balance,'amphours')
 Boattr::Data.new(brain01).new_to_dashboard(@current_sensors,'amps')
 Boattr::Data.new(brain01).new_to_dashboard(@temp_sensors,'temps')
+
+Boattr::Data.new(brain01).pump('foo',@stove_temp['value'],@cylinder_temp['value'],30)
