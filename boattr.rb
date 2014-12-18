@@ -20,18 +20,19 @@ module Boattr
     attr_reader :location, :i2cAddress, :i2cBus, :data, :basename
     def initialize(params)
       @@basename    = params['basename']
-      @i2cAddress   = params['i2cAddress']
+      @i2cAdcAddress   = params['i2cAdcAddress']
       @@device      = ::I2C.create(params['i2cBus'])
-      self.read()
+      self.readI2cADC(@i2cAdcAddress)
       self.onewire()
     end
-    def read
-      @i2cIter      = 16
-      @data = Array.new(10) {Array.new }
+    def readI2cADC(address)
+      @address = address
+      @iterate = 16
+      @data    = Array.new(10) {Array.new }
       @samples = []
-      @i2cIter.times do #we take @i2cIter samples
+      @iterate.times do #we take @iterate samples
         # read 20 bytes from slave, convert to decimals, and finaly in 10bit values.
-        @adc = @@device.read(i2cAddress, 0x14, 0x00).unpack('C*').map {|e| e.to_s 10}
+        @adc = @@device.read(@address, 0x14, 0x00).unpack('C*').map {|e| e.to_s 10}
         sleep(0.1)
         #slice the 20 byte array into pairs (MSB,LSB) and convert decimal.
         @adc.each_slice(2) {|a| @samples << a[0].to_i*256+a[1].to_i}
@@ -47,7 +48,7 @@ module Boattr
         d.pop
         d.shift
         d.shift
-        @@data << d.inject{|sum,x| sum + x }/(@i2cIter-4)
+        @@data << d.inject{|sum,x| sum + x }/(@iterate-4)
       end
       return  @@data
     end
@@ -100,6 +101,15 @@ module Boattr
       p @volts
       return { 'name' => @name, 'type' => 'water', 'value' => @raw }
     end
+    def pressure(name,address)
+      @name     = name
+      @address  = address
+      @raw      = @@data[address]
+      @atms    = @raw*0.00472
+      p @atms
+      return { 'name' => @name, 'type' => 'pressure', 'value' => @raw }
+    end
+
   end
 
   class Data
