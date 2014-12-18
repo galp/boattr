@@ -1,4 +1,4 @@
-require './boattr.rb'
+require '/root/boatmon/boattr.rb'
 
 brain01 = {
   'description' => 'analog/i2c from brain01',
