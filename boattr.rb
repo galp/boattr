@@ -4,6 +4,7 @@ require 'time'
 # need 'i2c' gem installed
 require "i2c/i2c"
 require "i2c/backends/i2c-dev"
+require 'gpio'
 require 'couchrest'
 require 'simple-graphite'
 require 'socket'
@@ -126,7 +127,7 @@ module Boattr
         end
         p x
         @doc ={ "_id" => now() }.merge x
-        @@sensorsdb.save_doc(@doc)
+        @sensorsdb.save_doc(@doc)
       end
     end
     def create_views(sensor_data)
@@ -162,7 +163,7 @@ module Boattr
         @name  = x['name']
         @type  = x['type']
         @mode  = x['mode']
-        @@sensorsdb.save_doc(
+        @sensorsdb.save_doc(
                             {
                               "_id" => "_design/#{@type}",
                             :views => {
@@ -222,6 +223,25 @@ module Boattr
       return [{"name" => "sources", "type" => "amphours", "hours" => @hours, "value" => @sources.round(2)},{"name" => "loads", "type" => "amphours", "hours" => @hours, "value" => @loads.round(2)} ]
     end
 
+    def pump(name,stove_temp,cal_temp,pin,stove_thres=40,cal_thres=20)
+      @name  = name
+      @stove_temp = stove_temp #['value']
+
+      @cal_temp    = cal_temp #['value']
+      p @stove_temp, @cal_temp
+      @pin         = pin
+      @cal_thres   = cal_thres
+      @stove_thres = stove_thres
+      @pump = ::GPIO::OutputPin.new(device: :BeagleboneBlack, pin: @pin )
+      if @cal_temp.nil? || @stove_temp.nil? ||  @stove_temp < @stove_thres || @cal_temp > @cal_thres  then
+        p "#{@name} off"
+        @pump.on #confusing as relays LOW is OFF
+      else
+        p "#{@name} on"
+        @pump.off #confusing as relays LOW is ON 
+      end
+    end
+
     def to_graphite(sensor_data)
       @base  = @@basename
       @data  = sensor_data
@@ -256,9 +276,6 @@ module Boattr
       end
     end
 
-<<<<<<< HEAD
-        @type  = x['type']
-=======
     def new_to_dashboard(sensor_data,widget)
       @data   = sensor_data
       @widget = widget
@@ -267,7 +284,6 @@ module Boattr
         if x.nil? then
           next
         end
->>>>>>> 889233e90c747b460b3d53c5f17487c323fb0ad2
         @name  = x['name']
         @value = x['value']
         @hours = x['hours']
@@ -281,8 +297,12 @@ module Boattr
     def get_remaining_data(name)
       @name = name
       @butes = 0
-      @page = Nokogiri::HTML(open("http://add-on.ee.co.uk/status"))
-      @data = @page.css('span')[0].text
+      begin
+        @page = Nokogiri::HTML(open("http://add-on.ee.co.uk/status"))
+        @data = @page.css('span')[0].text
+      rescue
+        return
+      end
       @unit = @data.slice(-2..-1)
       if @unit == 'GB'
         @bytes = @data.slice(0..-3).to_f
