@@ -275,7 +275,6 @@ module Boattr
                       :body => { auth_token: "#{@dash_auth}", current: @value, moreinfo: @type, title: @name }.to_json)
       end
     end
-
     def new_to_dashboard(sensor_data,widget)
       @data   = sensor_data
       @widget = widget

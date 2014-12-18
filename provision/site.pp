@@ -1,5 +1,3 @@
-
-
 node base {
   include users
   include packages
