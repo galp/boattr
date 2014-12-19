@@ -28,6 +28,6 @@ a = Boattr::Data.new(brain01)
 @balance  = a.amphourBalance(@boat_amph)
 @balance.concat(@boat_amph)
 
-a.new_to_dashboard(@balance,'amphours')
+a.list_to_dashboard(@balance,'amphours')
 
 
