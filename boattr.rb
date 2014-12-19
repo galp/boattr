@@ -219,10 +219,10 @@ module Boattr
       end
       return @merged
     end
-    def amphourBalance(amphours)
+    def amphourBalance(amphours_data)
       @loads,@sources = 0,0
-      amphours.each() do |x|
-        p x
+      @amphours       = amphours_data 
+      @amphours.each() do |x|
         if x['type'] == "amphours" &&  x['mode'] == "src" then
           @sources+= x['value']
         end
