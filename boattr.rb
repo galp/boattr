@@ -89,7 +89,7 @@ module Boattr
         file = File.open("#{@basedir}/#{address}/w1_slave",'r')
         if file.readline().include?('YES') then ## Is CRC valid in the first line? lets read the second and extract the temp
           @temp = file.readline().split()[-1].split('=')[-1].to_i/1000.0
-          return { 'name' => @name, 'address' => @address, 'type' => 'temp', 'value' => @temp.round(2) }
+          return { 'name' => @name, 'type' => 'temp', 'address' => @address,  'value' => @temp.round(2) }
         end
       end
     end
@@ -238,16 +238,15 @@ module Boattr
       @stove_temp = stove_temp #['value']
 
       @cal_temp    = cal_temp #['value']
-      p @stove_temp, @cal_temp
       @pin         = pin
       @cal_thres   = cal_thres
       @stove_thres = stove_thres
       @pump = ::GPIO::OutputPin.new(device: :BeagleboneBlack, pin: @pin )
       if @cal_temp.nil? || @stove_temp.nil? ||  @stove_temp < @stove_thres || @cal_temp > @cal_thres  then
-        p "#{@name} off"
+        puts "#{@name} off,  stove :#{@stove_temp}, cal : #{@cal_temp}"
         @pump.on #confusing as relays LOW is OFF
       else
-        p "#{@name} on"
+        p "#{@name} on,  stove :#{@stove_temp}, cal : #{@cal_temp}"
         @pump.off #confusing as relays LOW is ON 
       end
     end
