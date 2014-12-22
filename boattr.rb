@@ -233,24 +233,6 @@ module Boattr
       return [{"name" => "sources", "type" => "amphours", "hours" => @hours, "value" => @sources.round(2)},{"name" => "loads", "type" => "amphours", "hours" => @hours, "value" => @loads.round(2)} ]
     end
 
-    def pump(name,stove_temp,cal_temp,pin,stove_thres=40,cal_thres=20)
-      @name  = name
-      @stove_temp = stove_temp #['value']
-
-      @cal_temp    = cal_temp #['value']
-      @pin         = pin
-      @cal_thres   = cal_thres
-      @stove_thres = stove_thres
-      @pump = ::GPIO::OutputPin.new(device: :BeagleboneBlack, pin: @pin )
-      if @cal_temp.nil? || @stove_temp.nil? ||  @stove_temp < @stove_thres || @cal_temp > @cal_thres  then
-        puts "#{@name} off,  stove :#{@stove_temp}, cal : #{@cal_temp}"
-        @pump.on #confusing as relays LOW is OFF
-      else
-        p "#{@name} on,  stove :#{@stove_temp}, cal : #{@cal_temp}"
-        @pump.off #confusing as relays LOW is ON 
-      end
-    end
-
     def to_graphite(sensor_data)
       @base  = @@basename
       @data  = sensor_data
@@ -319,5 +301,38 @@ module Boattr
       end
       return { 'name' => @name, 'type' => 'data', 'value' => @bytes }
     end
+  end
+
+  class Control
+    def pump(name,stove_temp,cal_temp,pin,stove_thres=40,cal_thres=22)
+      @name  = name
+      @stove_temp = stove_temp #['value']
+
+      @cal_temp    = cal_temp #['value']
+      @pin         = pin
+      @cal_thres   = cal_thres
+      @stove_thres = stove_thres
+      @pump = ::GPIO::OutputPin.new(device: :BeagleboneBlack, pin: @pin )
+      if @cal_temp.nil? || @stove_temp.nil? ||  @stove_temp < @stove_thres || @cal_temp > @cal_thres  then
+        puts "#{@name} off,  stove :#{@stove_temp}, cal : #{@cal_temp}"
+        @pump.on #confusing as relays LOW is OFF
+      else
+        p "#{@name} on,  stove :#{@stove_temp}, cal : #{@cal_temp}"
+        @pump.off #confusing as relays LOW is ON 
+      end
+    end    
+    def button()
+      puts ''
+    end
+    
+    def light()
+      puts ''
+    end
+  end
+  class Camera
+    def camera(device)
+      #take a snapshot, upload to db
+    end
+
   end
 end

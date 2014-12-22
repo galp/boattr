@@ -67,4 +67,4 @@ dashing.to_dashboard(@brain01_sensors)
 Boattr::Data.new(brain01).new_to_dashboard(@current_sensors,'amps')
 Boattr::Data.new(brain01).new_to_dashboard(@temp_sensors,'temps')
 
-Boattr::Data.new(brain01).pump('foo',@stove_temp['value'],@cylinder_temp['value'],30)
+Boattr::Control.new().pump('calorifier pump',@stove_temp['value'],@cylinder_temp['value'],30)
