@@ -92,23 +92,6 @@ module Boattr
         end
       end
     end
-    def waterlevel(name,address)
-      @name     = name
-      @address  = address
-      @raw      = @@data[address]
-      @volts    = @raw*0.00472
-      p @volts
-      return { 'name' => @name, 'type' => 'water', 'value' => @raw }
-    end
-    def pressure(name,address)
-      @name     = name
-      @address  = address
-      @raw      = @@data[address]
-      @atms    = @raw*0.00472
-      p @atms
-      return { 'name' => @name, 'type' => 'pressure', 'value' => @raw }
-    end
-
   end
 
   class Data
@@ -229,7 +212,6 @@ module Boattr
       end
       return [{"name" => "sources", "type" => "amphours", "hours" => @hours, "value" => @sources.round(2)},{"name" => "loads", "type" => "amphours", "hours" => @hours, "value" => @loads.round(2)} ]
     end
-
     def to_graphite(sensor_data)
       @base  = @@basename
       @data  = sensor_data
@@ -333,13 +315,6 @@ module Boattr
         @pump.off #confusing as relays LOW is ON 
       end
     end    
-    def button()
-      puts ''
-    end
-    
-    def light()
-      puts ''
-    end
   end
   class Camera
     def camera(device)
