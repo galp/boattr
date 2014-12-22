@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 require 'json'
 require 'time'
-# need 'i2c' gem installed
+require 'yaml'
 require "i2c/i2c"
 require "i2c/backends/i2c-dev"
 require 'gpio'
@@ -19,9 +19,9 @@ module Boattr
     @@OWdevices = []
     attr_reader :location, :i2cAddress, :i2cBus, :data, :basename
     def initialize(params)
-      @@basename    = params['basename']
-      @i2cAdcAddress   = params['i2cAdcAddress']
-      @@device      = ::I2C.create(params['i2cBus'])
+      @@basename    = params['boattr']['basename']
+      @i2cAdcAddress   = params['boattr']['i2cAdcAddress']
+      @@device      = ::I2C.create(params['boattr']['i2cBus'])
       self.readI2cADC(@i2cAdcAddress)
       self.onewire()
     end
@@ -52,7 +52,12 @@ module Boattr
       end
       return  @@data
     end
-
+    def onewire()
+      @basedir  = '/sys/bus/w1/devices/'
+      Dir.chdir(@basedir)
+      @@OWdevices = Dir['*-*']
+      return @@OWdevices
+    end
     def voltage(name,address)
       @name    = name
       @raw     = @@data[address]
@@ -74,12 +79,6 @@ module Boattr
       end
       @amps    = (@volts-2.5)/@divider
       return { 'name' => @name, 'type' => 'current', 'mode' => @mode, 'raw' => @raw, 'value' => @amps.round(2)}
-    end
-    def onewire()
-      @basedir  = '/sys/bus/w1/devices/'
-      Dir.chdir(@basedir)
-      @@OWdevices = Dir['*-*']
-      return @@OWdevices
     end
     def temperature(name,address)
       @name     = name
@@ -114,15 +113,13 @@ module Boattr
 
   class Data
     def initialize(params)
-      @graphite    = params['graphite']
-      @couchdb     = params['couchdb']
-      @dashboard   = params['dashboard']
-      @dash_auth   = params['dash_auth']
-      @@basename   = params['basename']
-
+      @graphite    = params['graphite']['host']
+      @couchdb     = params['couchdb']['host']
+      @dashboard   = params['dashboard']['host']
+      @dash_auth   = params['dashboard']['auth']
+      @@basename   = params['boattr']['basename']
       unless @graphite.nil? || @graphite.empty? then
         @g         = Graphite.new({:host => "#{@graphite}", :port => 2003})
-
       end
       unless @couchdb.nil? || @couchdb.empty? then
         @sensorsdb = CouchRest.database!("http://#{@couchdb}:5984/#{@@basename}-sensors")
@@ -302,7 +299,15 @@ module Boattr
       return { 'name' => @name, 'type' => 'data', 'value' => @bytes }
     end
   end
-
+  class Config
+    def self.read(config_file='config.yml')
+      parsed = begin
+                 YAML.load(File.open(config_file))
+               rescue ArgumentError => e
+                 puts "Could not parse config file: #{e.message}"
+               end
+    end
+  end
   class Control
     def pump(name,stove_temp,cal_temp,pin,stove_thres=40,cal_thres=22)
       @name  = name

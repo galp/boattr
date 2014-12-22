@@ -2,17 +2,7 @@ require '/root/boatmon/boattr.rb'
 hostname = Socket.gethostname
 p hostname
 
-brain01 = {
-  'description'   => 'analog/i2c from brain01',
-  'basename'      => 'boat',
-  'i2cAdcAddress' => 0x28,
-  'i2cBarometer'  => 0x77,
-  'i2cBus'        => '/dev/i2c-1',
-  'couchdb'       => 'localhost',
-  'dashboard'     => 'localhost',
-  'graphite'      => '10.70.60.1',
-  'dash_auth'     => 'YOUR_AUTH_TOKEN',
-}
+brain01 = Boattr::Config.read
 
 sensors=Boattr::Sensors.new(brain01)
 dataAllowance = Boattr::Data.new(brain01).get_remaining_data('ee') 
