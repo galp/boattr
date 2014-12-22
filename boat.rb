@@ -2,7 +2,7 @@ require '/root/boatmon/boattr.rb'
 hostname = Socket.gethostname
 p hostname
 
-brain01 = Boattr::Config.read
+brain01 = Boattr::Config.read('/root/boatmon/config.yml')
 
 sensors=Boattr::Sensors.new(brain01)
 dataAllowance = Boattr::Data.new(brain01).get_remaining_data('ee') 
@@ -43,18 +43,19 @@ Boattr::Data.new(brain01).to_graphite(@brain01_sensors)
 
 @hours = 24
 
-dashing = Boattr::Data.new(brain01)
-dashing.to_dashboard(@brain01_sensors)
 
-
-
-@boat_amph = dashing.amphours(@brain01_sensors,@hours)
-@balance  = dashing.amphourBalance(@boat_amph)
-
+@boat_amph = Boattr::Data.new(brain01).amphours(@brain01_sensors,@hours)
+@balance   = Boattr::Data.new(brain01).amphourBalance(@boat_amph)
 @balance.concat(@boat_amph)
 
-#Boattr::Data.new(brain01).new_to_dashboard(@balance,'amphours')
-Boattr::Data.new(brain01).new_to_dashboard(@current_sensors,'amps')
-Boattr::Data.new(brain01).new_to_dashboard(@temp_sensors,'temps')
 
-Boattr::Control.new().pump('calorifier pump',@stove_temp['value'],@cylinder_temp['value'],30)
+
+dash = Boattr::Dashing.new(brain01)
+dash.list_to_dashboard(@current_sensors,'amps')
+dash.list_to_dashboard(@temp_sensors,'temps')
+dash.to_dashboard(@brain01_sensors)
+
+Boattr::Control.new().pump('calorifier pump',@stove_temp['value'],@cylinder_temp['value'],30,40,22)
+
+
+

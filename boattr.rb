@@ -250,6 +250,31 @@ module Boattr
       #used by to_db()
       return Time.now.to_f.round(2).to_s
     end
+
+    def get_remaining_data(name)
+      @name = name
+      @butes = 0
+      begin
+        @page = Nokogiri::HTML(open("http://add-on.ee.co.uk/status"))
+        @data = @page.css('span')[0].text
+      rescue
+        return
+      end
+      @unit = @data.slice(-2..-1)
+      if @unit == 'GB'
+        @bytes = @data.slice(0..-3).to_f
+      else
+        @bytes = @data.slice(0..-3).to_f/1000.0
+      end
+      return { 'name' => @name, 'type' => 'data', 'value' => @bytes }
+    end
+  end
+  class Dashing
+    def initialize(params)
+      @dashboard   = params['dashboard']['host']
+      @dash_auth   = params['dashboard']['auth']
+      
+    end
     def to_dashboard(sensor_data)
       @data = sensor_data
       @data.each() do |x|
@@ -279,24 +304,6 @@ module Boattr
       end
       HTTParty.post("http://#{@dashboard}:3030/widgets/#{@widget}",
                     :body => { auth_token: "#{@dash_auth}", items: @items , moreinfo: "last #{@hours} hours", title: @widget }.to_json)
-    end
-
-    def get_remaining_data(name)
-      @name = name
-      @butes = 0
-      begin
-        @page = Nokogiri::HTML(open("http://add-on.ee.co.uk/status"))
-        @data = @page.css('span')[0].text
-      rescue
-        return
-      end
-      @unit = @data.slice(-2..-1)
-      if @unit == 'GB'
-        @bytes = @data.slice(0..-3).to_f
-      else
-        @bytes = @data.slice(0..-3).to_f/1000.0
-      end
-      return { 'name' => @name, 'type' => 'data', 'value' => @bytes }
     end
   end
   class Config
