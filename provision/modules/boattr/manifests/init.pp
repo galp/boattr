@@ -1,5 +1,6 @@
-class boattr(
-  $boattr_dir = '/root/boatmon'
-  {
+class boattr (
+  $boattr_dir = '/root/boatmon',
+)
+{
   
 }

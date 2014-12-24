@@ -1,6 +1,7 @@
 node base {
-  include users
-  include packages
+  include apt
+  #include users
+  #include packages
 }
 
 node brain00 inherits base {
@@ -30,3 +31,20 @@ node brain02  {
   class { 'couchdb': }
 }
 
+node boattr {
+  $basename   = 'boattr'
+  $subnet     = '192.168.8'
+  $domain     = 'vagrant'
+  $ip         = "${subnet}.2"
+  $br_iface   = 'br0'
+  $wifi_iface = 'wlan0'
+  $ssid       = $boattr
+  class { 'apt': purge_sources_list => true } -> class { 'boattr':}
+  
+  class { 'boattr::dnsmasq':  subnet => $subnet, interface => $interface }
+  class { 'boattr::interfaces' :  }
+  class { 'boattr::ap' :  ssid => $ssid, wifi_iface => $wifi_iface }
+  class { 'boattr::storage': } -> class { 'boattr::couchdb': }
+  class { 'boattr::dashing': }
+  class { 'boattr::apt': }
+}
