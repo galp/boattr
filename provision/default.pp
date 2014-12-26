@@ -45,6 +45,6 @@ node boattr {
   class { 'boattr::interfaces' :  }
   class { 'boattr::ap' :  ssid => $ssid, wifi_iface => $wifi_iface }
   class { 'boattr::storage': } -> class { 'boattr::couchdb': }
-  class { 'boattr::dashing': }
-  class { 'boattr::apt': }
+  class { 'boattr::dashing': name => 'dash'}
+  class { 'boattr::packages': devel => true}
 }

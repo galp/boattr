@@ -3,21 +3,26 @@ class boattr::apt {
       release_id => 'wheezy',
     }
 
-  apt::source { 'debian_unstable':
-    comment           => 'uk debian unstable mirror',
+  apt::source { 'debian_testing':
+    comment           => 'uk debian testing mirror',
     location          => 'http://ftp.uk.debian.org/debian/ ',
-    release           => 'unstable',
+    release           => 'testing',
     repos             => 'main contrib non-free',
     required_packages => 'debian-keyring debian-archive-keyring',
-    key               => '8B48AD6246925553',
-    key_server        => 'subkeys.pgp.net',
-    pin               => '-10',
     include_deb       => true
   }
   apt::source { 'debian_stable':
     comment           => 'uk debian stable mirror',
     location          => 'http://ftp.uk.debian.org/debian/ ',
     release           => 'stable',
+    repos             => 'main contrib non-free',
+    required_packages => 'debian-keyring debian-archive-keyring',
+    include_deb       => true
+  }
+  apt::source { 'security':
+    comment           => 'debian security',
+    location          => 'http://security.debian.org/',
+    release           => 'wheezy/updates',
     repos             => 'main contrib non-free',
     required_packages => 'debian-keyring debian-archive-keyring',
     include_deb       => true

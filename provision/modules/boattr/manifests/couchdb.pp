@@ -1,5 +1,5 @@
 class boattr::couchdb (
-  $db_dir  = '/var/lib/couchdb/1.2.0',
+  $db_dir  = '/data/couchdb',
   $db_host = 'localhost'
 )
 
@@ -10,6 +10,15 @@ class boattr::couchdb (
     ensure  => present,
     content => template("${module_name}/local.ini"),
     notify  => Service['couchdb'],
+    require => Package['couchdb'],
   }
-  service {'couchdb' : ensure => running, require => Package['couchdb'] }
+  file { $db_dir :
+    ensure => directory,
+    owner  => 'couchdb',
+    group  => 'couchdb',
+    }
+  service {'couchdb' :
+    ensure =>  running,
+    require => [ Package['couchdb'],File[$db_dir]]
+  }
 }

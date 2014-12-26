@@ -1,14 +1,19 @@
 class boattr::dashing (
   $dashing_parent_dir = '/root',
-  $dashing_name       = 'boattr',
+  $name               = 'boattr-dash',
+  $auth_token         = 'YOUR_AUTH_TOKEN'
 )
 {
   
   package {'dashing' :
     ensure   => installed,
     provider => gem,
-    require  => File['/etc/init.d/dashing']
+    require  => Package['nodejs']
   }
+  package {'nodejs' :
+    ensure  => installed,
+  }
+
   file {'/etc/init.d/dashing' : 
     ensure  => present,
     mode    => 0755,
@@ -17,16 +22,26 @@ class boattr::dashing (
   }
   service {'dashing' :
     ensure => running,
-    require => File['/etc/init.d/dashing'] }
+    require => [File['/etc/init.d/dashing'], Exec['install_dashing']],
+  }
 
   exec {'install_dashing' :
-    command  => "dashing new $dashing_name",
-    cwd      => $dashing_dir,
-    creates  => $dashing_name,
+    command  => "dashing new $name",
+    path     => $path,
+    cwd      => $dashing_parent_dir,
+    creates  => "$dashing_parent_dir/$name",
     require  => Package['dashing'],
+  }  
+  exec {'bundle_dashing' :
+    command  => 'bundle',
+    path     => $path,
+    cwd      => "${dashing_parent_dir}/${name}",
+    creates  => "$dashing_parent_dir/$name",
+    require  => Exec['install_dashing'],
     notify   => Service['dashing'],
-  }
-  file { "$dashing_parent_dir/$dashing_name/dashboards/boattr.erb":
+  }  
+
+  file { "$dashing_parent_dir/$name/dashboards/boattr.erb":
     ensure  => present,
     require => Exec['install_dashing']
   }

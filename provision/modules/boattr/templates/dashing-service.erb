@@ -29,7 +29,7 @@
 DASHING_DIR="<%= @dashing_parent_dir %>/<%= @dashing_name %>"
 PID=$DASHING_DIR/tmp/pids/thin.pid
 GEM_HOME=/usr/local/lib/ruby/gems/2.1.0
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+PATH=<%= @path %>
 
 case "$1" in
 start)
@@ -47,7 +47,7 @@ tail -f $DASHING_DIR'log/thin.log'
 ;;
 status)
 # Check to see if the process is running
-ps aux|grep -i dashing
+ps aux|grep -i "thin server"
 ;;
  
 *)
