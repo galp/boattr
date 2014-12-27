@@ -10,7 +10,7 @@ brain01 = {
   'graphite'    => '10.70.60.1',
   'dash_auth'   => 'YOUR_AUTH_TOKEN',
 }
-
+brain01 = Boattr::Config.read('/root/boatmon/config.yml')
 sensor_data = [{"name"=>"solar", "type"=>"current", "mode"=>"src", "raw"=>513, "value"=>0.11},
                {"name"=>"lights", "type"=>"current", "mode"=>"load", "raw"=>512, "value"=>0.0},
                {"name"=>"ring", "type"=>"current", "mode"=>"load", "raw"=>508, "value"=>-0.26},
@@ -27,7 +27,7 @@ a = Boattr::Data.new(brain01)
 @boat_amph = a.amphours(sensor_data,@hours)
 @balance  = a.amphourBalance(@boat_amph)
 @balance.concat(@boat_amph)
-
-a.list_to_dashboard(@balance,'amphours')
+d = Boattr::Dashing.new(brain01) 
+d.list_to_dashboard(@balance,'amphours')
 
 

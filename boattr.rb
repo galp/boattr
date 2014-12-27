@@ -65,7 +65,7 @@ module Boattr
       return { 'name' => @name, 'type' => 'volts', 'raw' => @raw, 'value' => @volts.round(2) }
     end
     def current(name,address,model='acs714',mode='both')
-      @supported_models = { 'acs714' => 0.066, 'acs709' => 0.028}
+      @supported_models = { 'acs714' => 0.066, 'acs709' => 0.028, 'acs712' => 0.185}
       @name    = name
       @mode    = mode
       @divider = @supported_models[model]
