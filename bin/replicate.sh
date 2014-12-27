@@ -1,0 +1,1 @@
+curl  -H "Content-Type: application/json" --data '{ "source" : "sensors", "target" : "http://10.70.60.1:5984/sensors" }' -X POST  http://192.168.8.1:5984/_replicate
