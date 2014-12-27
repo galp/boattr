@@ -1,17 +1,17 @@
 boattr:
-   basename: <%= basename %>
-   description: <%= description %>
-   i2cBus: "<%= i2cBus %>"
-   i2cAdcAddress: "<%= i2cAdcAddress %>"
+   basename: <%= @basename %>
+   description: <%= @description %>
+   i2cBus: "<%= @i2cBus %>"
+   i2cAdcAddress: "<%= @i2cAdcAddress %>"
 database:
-   host: "<%= db_host %>"
-   dir:  "<%= db_dir %>"
+   host: "<%= @db_host %>"
+   dir:  "<%= @db_dir %>"
 dashboard:
-   host: "<%= dash_host %>"
-   dir:  "<%= dash_dir %>"   
-   auth: "<%= dash_auth %>"   
+   host: "<%= @dash_host %>"
+   dir:  "<%= @dash_dir %>"   
+   auth: "<%= @dash_auth %>"   
 graphite:
-   host: "<%= graph_host %>"   
+   host: "<%= @graph_host %>"   
 sensors:
    temp:
       bed: 28-12345677
@@ -22,6 +22,16 @@ sensors:
         pin:  2
         type:  acs712
         mode:  src
+      genny:
+        name: genny
+        pin:  2
+        type:  acs709
+        mode:  src
+      ring:
+        name: ring
+        pin:  2
+        type:  acs712
+        mode:  load
    voltage:
       batteries:
         name: batteries

@@ -1,10 +1,10 @@
 class boattr::couchdb (
-  $db_dir   = '/data/couchdb',
-  $db_host  = 'localhost',
-  $basename = 'boattr'
-)
-
+  $db_dir   = $::boattr::params::db_dir,
+  $db_host  = $::boattr::params::db_host,
+  $basename = $::boattr::params::basename
+  ) inherits boattr::params
 {
+
   package { 'couchdb' : ensure => installed}
   package {'couchrest' : ensure   => installed, provider => gem }
   file {'/etc/couchdb/local.ini' : 
@@ -17,7 +17,7 @@ class boattr::couchdb (
     ensure => directory,
     owner  => 'couchdb',
     group  => 'couchdb',
-    }
+  }
   service {'couchdb' :
     ensure =>  running,
     require => [ Package['couchdb'],File[$db_dir]]

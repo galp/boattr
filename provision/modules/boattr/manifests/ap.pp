@@ -1,8 +1,9 @@
 class boattr::ap (
-  $wifi_iface = 'wlan0',
-  $ssid       = 'wireless',
-  $password   = 'testing',
-  $channel    = '11')
+  $wifi_iface = $::boattr::params::wifi_iface,
+  $ssid       = $::boattr::params::wifi_ssid,
+  $password   = $::boattr::params::wifi_pass,
+  $channel    = $::boattr::params::wifi_channel
+  ) inherits boattr::params
 {
   $packages = ['hostapd', 'firmware-atheros', 'haveged']
   package {$packages : ensure => present }

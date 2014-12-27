@@ -1,7 +1,10 @@
-class boattr::interfaces {
+class boattr::interfaces (
+  $ip = $::boattr::params::lan_ip
+) inherits boattr::params
+{
   $packages = ['bridge-utils']
   package {$packages : ensure => present }
-
+  
   case $::is_virtual {
     'false' : {
 
