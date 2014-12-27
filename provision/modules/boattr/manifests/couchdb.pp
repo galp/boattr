@@ -1,6 +1,7 @@
 class boattr::couchdb (
-  $db_dir  = '/data/couchdb',
-  $db_host = 'localhost'
+  $db_dir   = '/data/couchdb',
+  $db_host  = 'localhost',
+  $basename = 'boattr'
 )
 
 {
@@ -20,5 +21,11 @@ class boattr::couchdb (
   service {'couchdb' :
     ensure =>  running,
     require => [ Package['couchdb'],File[$db_dir]]
+  }
+  cron { 'compact_couchdb_cron':
+    command => "curl -H \"Content-Type: application/json\" -X POST  http://${db_host}:5984/${basename}-sensors/_compact",
+    user    => root,
+    hour    => '3',
+    minute  => '0'
   }
 }

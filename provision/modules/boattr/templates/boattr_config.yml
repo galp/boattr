@@ -1,0 +1,28 @@
+boattr:
+   basename: <%= basename %>
+   description: <%= description %>
+   i2cBus: "<%= i2cBus %>"
+   i2cAdcAddress: "<%= i2cAdcAddress %>"
+database:
+   host: "<%= db_host %>"
+   dir:  "<%= db_dir %>"
+dashboard:
+   host: "<%= dash_host %>"
+   dir:  "<%= dash_dir %>"   
+   auth: "<%= dash_auth %>"   
+graphite:
+   host: "<%= graph_host %>"   
+sensors:
+   temp:
+      bed: 28-12345677
+      out: 10-23213212
+   current:
+      solar:
+        name: solar
+        pin:  2
+        type:  acs712
+        mode:  src
+   voltage:
+      batteries:
+        name: batteries
+        pin: 3

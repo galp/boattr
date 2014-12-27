@@ -40,10 +40,7 @@ node boattr {
   $wifi_iface = 'wlan0'
   $ssid       = $boattr
   class { 'apt': purge_sources_list => true } -> class { 'boattr':}
-  
-  class { 'boattr::dnsmasq':  subnet => $subnet, interface => $interface }
-  class { 'boattr::interfaces' :  }
-  class { 'boattr::ap' :  ssid => $ssid, wifi_iface => $wifi_iface }
+  class { 'boattr::interfaces' :  } -> class { 'boattr::dnsmasq':  subnet => $subnet, interface => $br_iface } ->   class { 'boattr::ap' :  ssid => $ssid, wifi_iface => $wifi_iface }
   class { 'boattr::storage': } -> class { 'boattr::couchdb': }
   class { 'boattr::dashing': name => 'dash'}
   class { 'boattr::packages': devel => true}
