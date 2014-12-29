@@ -1,6 +1,7 @@
 class boattr::dnsmasq (
-  $subnet    = $::boattr::params::lan_subnet,
-  $interface = $::boattr::params::lan_iface
+  $lan_subnet    = $::boattr::params::lan_subnet,
+  $lan_iface     = $::boattr::params::lan_iface,
+  $domain        = $::boattr::params::domain,
   ) inherits boattr::params
 {
 
