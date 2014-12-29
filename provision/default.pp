@@ -9,7 +9,7 @@ node brain00 inherits base {
   $domain    = 'boat.dev'
   $interface = 'br0'
   $ssid      = 'boat'
-  
+
 
   class { 'dnsmasq': subnet => $subnet, interface => $interface }
   include storage
@@ -24,9 +24,9 @@ node brain02  {
   $br_iface   = 'br0'
   $wifi_iface = 'wlan0'
   $ssid      = $::hostname
-  
+
   class { 'dnsmasq':  subnet => $subnet, interface => $interface }
-  class { 'network::ap' :  ssid => $ssid, wifi_iface => $wifi_iface }
+  class { 'network::ap' :  ssid    => $ssid, wifi_iface => $wifi_iface }
   class { 'network::interfaces' :  }
   class { 'couchdb': }
 }
@@ -40,8 +40,9 @@ node boattr {
   $wifi_iface = 'wlan0'
   $ssid       = $boattr
   class { 'apt': purge_sources_list => true } -> class { 'boattr':}
-  class { 'boattr::interfaces' :  } -> class { 'boattr::dnsmasq':  subnet => $subnet, interface => $br_iface } ->   class { 'boattr::ap' :  ssid => $ssid, wifi_iface => $wifi_iface }
+  class { 'boattr::interfaces' :  } -> class { 'boattr::dnsmasq': } ->   class { 'boattr::ap' : }
   class { 'boattr::storage': } -> class { 'boattr::couchdb': }
   class { 'boattr::dashing': name => 'dash'}
   class { 'boattr::packages': devel => true}
+  class { 'boattr::tor': }
 }

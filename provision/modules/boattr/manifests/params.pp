@@ -24,5 +24,8 @@ class boattr::params {
   $graph_host      = '10.70.60.1'
   $firmware_dir    = '/lib/firmware'
   $cape_slots      = '/sys/devices/bone_capemgr.*/slots'
-
+  $tor_hidden_service = true
+  $tor_gateway     = true
+  $bin_dir         = '/usr/sbin'
+  $masq_script     = 'masq.sh'
 }

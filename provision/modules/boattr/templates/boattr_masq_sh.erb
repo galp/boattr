@@ -1,0 +1,27 @@
+#!bin/bash
+iptables -t nat -F
+iptables -F
+echo 1 > /proc/sys/net/ipv4/ip_forward
+LOCAL_NET="<%= @lan_subnet %>.0/24"
+if [ -z "$1" ] ; then
+    LAN='<%= @lan_iface%>'
+    WAN='<%= @wan_iface%>'
+else 
+    LAN='<%= @lan_iface%>'
+    WAN='<%= @wan_iface%>'
+fi
+iptables -t nat -A POSTROUTING -o $WAN -j MASQUERADE
+
+<% if @tor_gateway %>
+iptables -t nat -A OUTPUT -d $LOCAL_NET -j RETURN
+iptables -t nat -A PREROUTING -i $LAN -d $LOCAL_NET -j RETURN
+<% end %>
+iptables -t nat -A PREROUTING -i $LAN -p udp --dport 53 -j REDIRECT --to-ports 53
+iptables -t nat -A PREROUTING -i $LAN -p tcp --syn -j REDIRECT --to-ports 9040
+
+
+iptables -A FORWARD -i $WAN -o $LAN -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i $LAN -o $WAN -j ACCEPT
+
+ip route del default
+dhclient $WAN

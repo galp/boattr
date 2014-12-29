@@ -14,7 +14,10 @@ class boattr (
   $cape_slots   = $::boattr::params::cape_slots,
   $lan_iface    = $::boattr::params::lan_iface,
   $wan_iface    = $::boattr::params::wan_iface,
-) inherits boattr::params
+  $tor_gateway        = $::boattr::params::tor_gateway,
+  $bin_dir         = $::boattr::params::bin_dir,
+  $masq_script = $::boattr::params::masq_script,
+  ) inherits boattr::params
 {
   vcsrepo { $boattr_dir:
     ensure   => present,
@@ -37,6 +40,17 @@ class boattr (
     ensure => present,
     source => 'puppet:///modules/boattr/BB-W1-00A0.dtbo'
   }
+  file {"${bin_dir}/${masq_script}":
+    ensure => present,
+    content => template("${module_name}/boattr_masq_sh.erb"),
+    mode   => '0755',
+    notify => Exec['masq_sh_script']
+  }
+  exec {'masq_sh_script' :
+    command     => "${bin_dir}/${masq_script} ${lan_iface} ${wan_iface}",
+    refreshonly => true,
+    require     => File["${bin_dir}/${masq_script}"],
+    }
   file_line { 'load_one_wire_device_tree' :
     ensure  => present,
     line    => "echo BB-W1-00A0 > $cape_slots",
@@ -51,9 +65,9 @@ class boattr (
   }
   file_line { 'start_masq_sh_on_boot' :
     ensure  => present,
-    line    => "sh ${boattr_dir}/bin/masq.sh ${lan_iface} ${wan_iface}",
+    line    => "${bin_dir}/${masq_script} ${lan_iface} ${wan_iface}",
     path    => '/etc/rc.local',
-    require => [File["/lib/firmware/BB-W1-00A0.dtbo"],File_line['remove_exit']],
+    require => [File["/lib/firmware/BB-W1-00A0.dtbo"],File["${bin_dir}/${masq_script}"],File_line['remove_exit']],
     }
 
 }
