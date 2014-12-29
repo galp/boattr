@@ -9,6 +9,13 @@ class boattr::tor (
   package { $packagelist :
     ensure => latest,
   }
+
+  apt::source { 'tor_apt_repo':
+    location   => 'http://deb.torproject.org/torproject.org',
+    repos      => 'main',
+    key        => '886DDD89',
+  }
+
   file { '/etc/tor/torrc':
     ensure  => present,
     content => template("${module_name}/boattr_torrc.erb"),
