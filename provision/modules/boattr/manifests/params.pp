@@ -18,9 +18,11 @@ class boattr::params {
   $dash_parent_dir = '/root'
   $dash_name       = "${basename}-dash"
   $dash_dir        = "${dash_parent_dir}/${dash_name}"
-  $dash_auth        = 'YOUR_AUTH_TOKEN'
+  $dash_auth       = 'YOUR_AUTH_TOKEN'
   $i2cAdcAddress   = '0x28'
   $i2cBus          = '/dev/i2c-1'
   $graph_host      = '10.70.60.1'
+  $firmware_dir    = '/lib/firmware'
+  $cape_slots      = '/sys/devices/bone_capemgr.*/slots'
 
 }

@@ -3,8 +3,8 @@ class boattr::packages (
 )
 {
   
-  $packagelist = [ 'screen', 'mosh' ]
-  $devpackagelist = ['i2c-tools','emacs24-nox', 'puppet-el','curl',' build-essential']
+  $packagelist = [ 'screen', 'mosh','iptables','curl' ]
+  $devpackagelist = ['i2c-tools','emacs24-nox', 'puppet-el',' build-essential']
 
   package { $packagelist :
     ensure => installed,
