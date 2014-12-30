@@ -1,5 +1,6 @@
 class boattr::interfaces (
-  $ip = $::boattr::params::lan_ip
+  $lan_ip       = $::boattr::params::lan_ip,
+  $wired_iface  = $::boattr::params::wired_iface
 ) inherits boattr::params
 {
   $packages = ['bridge-utils']
