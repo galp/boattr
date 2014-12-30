@@ -2,6 +2,7 @@ class boattr::dnsmasq (
   $lan_subnet    = $::boattr::params::lan_subnet,
   $lan_iface     = $::boattr::params::lan_iface,
   $domain        = $::boattr::params::domain,
+  $dhcp_auth     = $::boattr::params::dhcp_auth,
   ) inherits boattr::params
 {
   require boattr::apt

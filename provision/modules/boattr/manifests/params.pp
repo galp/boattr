@@ -29,4 +29,6 @@ class boattr::params {
   $tor_gateway     = true
   $bin_dir         = '/usr/sbin'
   $masq_script     = 'masq.sh'
+  $dhcp_auth       = undef
+  $with_tor        = true
 }

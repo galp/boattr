@@ -13,12 +13,18 @@ class boattr (
   $graph_host   = $::boattr::params::graph_host,
   $cape_slots   = $::boattr::params::cape_slots,
   $lan_iface    = $::boattr::params::lan_iface,
+  $lan_ip       = $::boattr::params::lan_ip,
   $wan_iface    = $::boattr::params::wan_iface,
   $tor_gateway        = $::boattr::params::tor_gateway,
   $bin_dir         = $::boattr::params::bin_dir,
   $masq_script = $::boattr::params::masq_script,
+  $with_tor    = $::boattr::params::with_tor,
   ) inherits boattr::params
 {
+  if $with_tor {
+    class { 'boattr::tor': lan_ip => $lan_ip }
+  }
+  
   vcsrepo { $boattr_dir:
     ensure   => present,
     provider => git,

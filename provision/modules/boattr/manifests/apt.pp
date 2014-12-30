@@ -19,16 +19,31 @@ class boattr::apt {
   apt::source { 'debian_stable':
     comment           => 'uk debian stable mirror',
     location          => 'http://ftp.uk.debian.org/debian/ ',
-    release           => 'stable',
+    release           => $::lsbdistcodename,
     repos             => 'main contrib non-free',
     include_deb       => true
   }
+  apt::source { "${::lsbdistcodename}_updates":
+    comment           => 'debian updates',
+    location          => 'http://ftp.uk.debian.org/debian/ ',
+    release           => "${::lsbdistcodename}-updates",
+    repos             => 'main contrib non-free',
+    include_deb       => true
+  }
+
   apt::source { 'security':
     comment           => 'debian security',
     location          => 'http://security.debian.org/',
-    release           => 'wheezy/updates',
+    release           => "${::lsbdistcodename}/updates",
     repos             => 'main contrib non-free',
     required_packages => 'debian-keyring debian-archive-keyring',
+    include_deb       => true
+  }
+  apt::source { 'beaglebone_debian':
+    comment           => 'beaglebone debian',
+    location          => '[arch=armhf] http://debian.beagleboard.org/packages',
+    release           => "${::lsbdistcodename}-bbb",
+    repos             => 'main',
     include_deb       => true
   }
 
