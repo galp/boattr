@@ -1,36 +1,23 @@
-node base {
-  include apt
-  #include users
-  #include packages
+node default {
+  class { 'ntp': iburst_enable => true }
+  class { 'boattr': }
+  class { 'boattr::interfaces' :  } -> class { 'boattr::dnsmasq': } ->   class { 'boattr::ap' : }
+  class { 'boattr::tor': }
+  class { 'boattr::storage': } -> class { 'boattr::couchdb': }
+  class { 'boattr::dashing': name => 'dash'}
+  class { 'boattr::packages':  devel => true }
+
 }
 
-node brain00 inherits base {
+node brain00 inherits default {
   $subnet    = '192.168.8'
   $domain    = 'boat.dev'
   $interface = 'br0'
   $ssid      = 'boat'
 
-
-  class { 'dnsmasq': subnet => $subnet, interface => $interface }
-  include storage
-  include couchdb
-  include boattr
 }
 
-node brain02  {
-  $subnet     = '192.168.8'
-  $domain     = 'camp'
-  $ip         = "${subnet}.99"
-  $br_iface   = 'br0'
-  $wifi_iface = 'wlan0'
-  $ssid      = $::hostname
-
-  class { 'dnsmasq':  subnet => $subnet, interface => $interface }
-  class { 'network::ap' :  ssid    => $ssid, wifi_iface => $wifi_iface }
-  class { 'network::interfaces' :  }
-  class { 'couchdb': }
-}
-
+  
 node boattr {
   $basename   = 'boattr'
   $subnet     = '192.168.8'
@@ -39,10 +26,6 @@ node boattr {
   $br_iface   = 'br0'
   $wifi_iface = 'wlan0'
   $ssid       = $boattr
-  class { 'apt': purge_sources_list => true } -> class { 'boattr':}
-  class { 'boattr::interfaces' :  } -> class { 'boattr::dnsmasq': } ->   class { 'boattr::ap' : }
-  class { 'boattr::storage': } -> class { 'boattr::couchdb': }
-  class { 'boattr::dashing': name => 'dash'}
-  class { 'boattr::packages': devel => true}
-  class { 'boattr::tor': }
+  
+  
 }

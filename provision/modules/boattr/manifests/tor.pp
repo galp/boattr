@@ -5,9 +5,11 @@ class boattr::tor (
   $lan_ip             = $::boattr::params::lan_ip
   ) inherits boattr::params
 {
+  
   $packagelist = ['tor','tor-geoipdb']
   package { $packagelist :
-    ensure => latest,
+    ensure  => latest,
+    require => Apt::Source['tor_apt_repo']
   }
 
   apt::source { 'tor_apt_repo':
@@ -20,6 +22,7 @@ class boattr::tor (
     ensure  => present,
     content => template("${module_name}/boattr_torrc.erb"),
     require => Package[$packagelist],
+    notify  => Service['tor'],
   }
   if $tor_hidden_service {
     file { "/var/lib/tor/${basename}" :
@@ -27,6 +30,7 @@ class boattr::tor (
       owner   => debian-tor,
       group   => debian-tor,
       notify  => Service['tor'],
+      require => Package['tor'],
     }
   }
   service { 'tor' :

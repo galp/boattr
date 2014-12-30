@@ -5,6 +5,8 @@ class boattr::ap (
   $channel    = $::boattr::params::wifi_channel
   ) inherits boattr::params
 {
+  require boattr::apt
+  
   $packages = ['hostapd', 'firmware-atheros', 'haveged']
   package {$packages : ensure => present }
   

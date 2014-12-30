@@ -4,7 +4,7 @@ class boattr::couchdb (
   $basename = $::boattr::params::basename
   ) inherits boattr::params
 {
-
+  require boattr::apt
   package { 'couchdb' : ensure => installed}
   package {'couchrest' : ensure   => installed, provider => gem }
   file {'/etc/couchdb/local.ini' : 

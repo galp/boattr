@@ -4,7 +4,7 @@ class boattr::dnsmasq (
   $domain        = $::boattr::params::domain,
   ) inherits boattr::params
 {
-
+  require boattr::apt
   $packages  = ['dnsmasq']
   package {$packages : ensure => present }
   service { 'dnsmasq' : ensure  => running,

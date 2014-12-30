@@ -4,16 +4,21 @@ class boattr::dashing (
   $dash_auth_token         = $::boattr::params::dash_auth_token,
 )
 {
-  
+  require boattr::apt
+  $packages = ['nodejs','libv8-3.14.5','libc6-dev','libssl-dev','zlib1g-dev']
   package {'dashing' :
     ensure   => installed,
     provider => gem,
-    require  => Package['nodejs']
+    require  => Package[$packages]
   }
-  package {'nodejs' :
+  package { $packages :
     ensure  => installed,
+    require => Apt::Force['libc6']
   }
-
+  apt::force { 'libc6':
+    release     => 'testing',
+    #require => Apt::Source['debian_unstable'],
+  }
   file {'/etc/init.d/dashing' : 
     ensure  => present,
     mode    => 0755,
@@ -22,7 +27,7 @@ class boattr::dashing (
   }
   service {'dashing' :
     ensure => running,
-    require => [File['/etc/init.d/dashing'], Exec['install_dashing']],
+    require => [File['/etc/init.d/dashing'], Exec['install_dashing'],Package['nodejs']],
   }
 
   exec {'install_dashing' :
