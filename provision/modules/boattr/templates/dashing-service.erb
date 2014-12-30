@@ -26,9 +26,9 @@
 # Based on  Faraz Haider's LifeRay Startup Service script
 # https://gist.github.com/haiderfaraz/2773431
 
-DASHING_DIR="<%= @dashing_parent_dir %>/<%= @dashing_name %>"
-PID=$DASHING_DIR/tmp/pids/thin.pid
-GEM_HOME=/usr/local/lib/ruby/gems/2.1.0
+DASHING_DIR="<%= @dash_parent_dir %>/<%= @dash_name %>"
+PID=${DASHING_DIR}/tmp/pids/thin.pid
+#GEM_HOME=/usr/local/lib/ruby/gems/2.1.0
 PATH=<%= @path %>
 
 case "$1" in
