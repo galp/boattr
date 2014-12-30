@@ -7,10 +7,10 @@ class boattr::storage (
   case $::is_virtual {
     'false' : {
       mount { $data_dir : 
-        device  => $data_dev,
+        device  => "UUID=${data_dev}",
         ensure  => mounted,
         atboot  => true,
-        fstype  => ext2,
+        fstype  => auto,
         options => 'defaults,data=writeback,noatime,nodiratime',
         require => File[$data_dir],
       }

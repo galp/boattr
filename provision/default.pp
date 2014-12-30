@@ -3,7 +3,6 @@ node default {
   class { 'ntp': iburst_enable => true }
   class { 'boattr': lan_ip => $ip}
   class { 'boattr::interfaces' : lan_ip => $ip } -> class { 'boattr::dnsmasq': } ->   class { 'boattr::ap' : }
-  class { 'boattr::tor': lan_ip => $ip }
   class { 'boattr::storage': } -> class { 'boattr::couchdb': }
   class { 'boattr::dashing': }
   class { 'boattr::packages':  devel => true }

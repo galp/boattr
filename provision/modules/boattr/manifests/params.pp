@@ -1,16 +1,18 @@
 class boattr::params {
   $basename        = 'boattr'
   $description     = 'boattr foo bar'
+  $domain          = 'btr'
   $data_dir        = '/data'
-  $data_dev        = '/dev/sdb1'
+  $data_dev        = '68079340-4954-438a-935c-b57b0236313b'
   $lan_subnet      = '192.168.8'
-  $lan_ip          = "${lan_subnet}.2"
+  $lan_ip          = "${lan_subnet}.1"
   $lan_iface       = 'br0'
   $wan_iface       = 'usb0'
   $wired_iface     = 'eth0'
   $db_dir          = "${data_dir}/couchdb"
   $db_host         = 'localhost'
   $boattr_dir      = "/root/${basename}"
+  $boattr_run      = 'boat'
   $wifi_iface      = 'wlan0'
   $wifi_ssid       = $basename
   $wifi_password   = 'testing'

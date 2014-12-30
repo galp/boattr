@@ -2,7 +2,6 @@ class boattr (
   $boattr_dir = $::boattr::params::boattr_dir,
   $basename   = $::boattr::params::basename,
   $description   = $::boattr::params::description,
-  $basename   = $::boattr::params::basename,
   $i2cBus   = $::boattr::params::i2cBus,
   $i2cAdcAddress   = $::boattr::params::i2cAdcAddress,
   $db_host   = $::boattr::params::db_host,
@@ -31,7 +30,7 @@ class boattr (
     source   => "git://github.com/galp/boattr.git",
   }
   cron { 'boattr_run':
-    command => "ruby ${boattr_dir}/${basename}.rb >  /run/{$basename}.log  2>&1",
+    command => "ruby ${boattr_dir}/${boattr_run}.rb >  /run/${basename}.log  2>&1",
     user    => root,
     hour    => '*',
     minute  => '*/1'
