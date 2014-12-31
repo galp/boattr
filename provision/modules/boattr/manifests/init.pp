@@ -1,23 +1,23 @@
 class boattr (
-  $boattr_dir = $::boattr::params::boattr_dir,
-  $basename   = $::boattr::params::basename,
+  $boattr_dir    = $::boattr::params::boattr_dir,
+  $basename      = $::boattr::params::basename,
   $description   = $::boattr::params::description,
-  $i2cBus   = $::boattr::params::i2cBus,
-  $i2cAdcAddress   = $::boattr::params::i2cAdcAddress,
-  $db_host   = $::boattr::params::db_host,
-  $db_dir   = $::boattr::params::db_dir,
-  $dash_dir   = $::boattr::params::dash_dir,
-  $dash_host   = $::boattr::params::dash_host,
-  $dash_auth   = $::boattr::params::dash_auth,
-  $graph_host   = $::boattr::params::graph_host,
-  $cape_slots   = $::boattr::params::cape_slots,
-  $lan_iface    = $::boattr::params::lan_iface,
-  $lan_ip       = $::boattr::params::lan_ip,
-  $wan_iface    = $::boattr::params::wan_iface,
-  $tor_gateway        = $::boattr::params::tor_gateway,
-  $bin_dir         = $::boattr::params::bin_dir,
-  $masq_script = $::boattr::params::masq_script,
-  $with_tor    = $::boattr::params::with_tor,
+  $i2cBus        = $::boattr::params::i2cBus,
+  $i2cAdcAddress = $::boattr::params::i2cAdcAddress,
+  $db_host       = $::boattr::params::db_host,
+  $db_dir        = $::boattr::params::db_dir,
+  $dash_dir      = $::boattr::params::dash_dir,
+  $dash_host     = $::boattr::params::dash_host,
+  $dash_auth     = $::boattr::params::dash_auth,
+  $graph_host    = $::boattr::params::graph_host,
+  $cape_slots    = $::boattr::params::cape_slots,
+  $lan_iface     = $::boattr::params::lan_iface,
+  $lan_ip        = $::boattr::params::lan_ip,
+  $wan_iface     = $::boattr::params::wan_iface,
+  $tor_gateway   = $::boattr::params::tor_gateway,
+  $bin_dir       = $::boattr::params::bin_dir,
+  $masq_script   = $::boattr::params::masq_script,
+  $with_tor      = $::boattr::params::with_tor,
   ) inherits boattr::params
 {
   if $with_tor {
@@ -29,6 +29,15 @@ class boattr (
     provider => git,
     source   => "git://github.com/galp/boattr.git",
   }
+  exec {'bundle_boattr' :
+    command  => 'bundle',
+    path     => $path,
+    cwd      => $boattr_dir,
+    creates  => "${boattr_dir}/Gemfile.lock",
+    require  => Vcsrepo[$boattr_dir],
+    #notify   => Service['dashing'],
+  }  
+
   cron { 'boattr_run':
     command => "ruby ${boattr_dir}/${boattr_run}.rb >  /run/${basename}.log  2>&1",
     user    => root,

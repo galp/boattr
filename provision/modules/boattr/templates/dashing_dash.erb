@@ -1,0 +1,30 @@
+<script type='text/javascript'>
+$(function() {
+Dashing.gridsterLayout('[{"col":2,"row":1,"size_x":1,"size_y":1},{"col":1,"row":1,"size_x":1,"size_y":1},{"col":3,"row":1,"size_x":1,"size_y":1},{"col":4,"row":1,"size_x":1,"size_y":1},{"col":1,"row":2,"size_x":1,"size_y":1},{"col":2,"row":2,"size_x":1,"size_y":1},{"col":3,"row":2,"size_x":1,"size_y":1},{"col":4,"row":2,"size_x":1,"size_y":1}]')
+});
+</script>
+<%% content_for :title do %>Boattr dashboard<%% end %>
+<div class="gridster">
+  <ul>
+    <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
+      <div data-id="voltsbatteries" data-view="Number" data-title="Battery Voltage" data-suffix="V" data-min="11" data-max="15"></div>
+    </li>
+    <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
+      <div data-id="currentsolar" data-view="Number" data-title="amps solar" data-suffix="A"></div>
+    </li>
+    <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
+      <div data-id="dataee" data-view="Number" data-title="Data Left" data-suffix="gb" ></div>
+    </li>
+    <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
+      <div data-id="amphours" data-view="List" data-unordered="true" data-title="Amphours" data-moreinfo="electricy init?"></div>
+    </li>
+    <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
+      <div data-id="temps" data-view="List" data-unordered="true" data-title="Temps(C)" data-moreinfo="nice and warm" style="background-color:#ff9618"></div>
+    </li>
+    <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
+      <div data-id="amps" data-view="List" data-unordered="true" data-title="Current(A)" data-moreinfo="bzzt" style="background-color:#ff9518"></div>
+    </li>
+
+  </ul>
+lol
+</div>

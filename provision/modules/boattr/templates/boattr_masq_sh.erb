@@ -15,10 +15,9 @@ iptables -t nat -A POSTROUTING -o $WAN -j MASQUERADE
 <% if @tor_gateway %>
 iptables -t nat -A OUTPUT -d $LOCAL_NET -j RETURN
 iptables -t nat -A PREROUTING -i $LAN -d $LOCAL_NET -j RETURN
-<% end %>
 iptables -t nat -A PREROUTING -i $LAN -p udp --dport 53 -j REDIRECT --to-ports 53
 iptables -t nat -A PREROUTING -i $LAN -p tcp --syn -j REDIRECT --to-ports 9040
-
+<% end %>
 
 iptables -A FORWARD -i $WAN -o $LAN -m state --state RELATED,ESTABLISHED -j ACCEPT
 iptables -A FORWARD -i $LAN -o $WAN -j ACCEPT

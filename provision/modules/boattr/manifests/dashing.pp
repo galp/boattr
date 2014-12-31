@@ -48,6 +48,7 @@ class boattr::dashing (
 
   file { "${dash_parent_dir}/${dash_name}/dashboards/boattr.erb":
     ensure  => present,
+    content => template("${module_name}/dashing_dash.erb"),
     require => Exec['install_dashing']
   }
 }
