@@ -67,7 +67,7 @@ class boattr (
     }
   file_line { 'load_one_wire_device_tree' :
     ensure  => present,
-    line    => "echo BB-W1-00A0 > $cape_slots",
+    line    => "echo BB-W1:00A0 > $cape_slots",
     path    => '/etc/rc.local',
     require => [File["/lib/firmware/BB-W1-00A0.dtbo"],File_line['remove_exit']],
   }
