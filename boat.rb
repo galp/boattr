@@ -1,8 +1,8 @@
-require '/root/boatmon/boattr.rb'
+require '/root/boattr/boattr.rb'
 hostname = Socket.gethostname
 p hostname
 
-brain01 = Boattr::Config.read('/root/boatmon/config.yml')
+brain01 = Boattr::Config.read('/root/boattr/config.yml')
 
 sensors=Boattr::Sensors.new(brain01)
 dataAllowance = Boattr::Data.new(brain01).get_remaining_data('ee') 

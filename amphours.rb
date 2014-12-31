@@ -1,4 +1,4 @@
-require '/root/boatmon/boattr.rb'
+require '/root/boattr/boattr.rb'
 
 brain01 = {
   'description' => 'analog/i2c from brain01',
@@ -10,7 +10,7 @@ brain01 = {
   'graphite'    => '10.70.60.1',
   'dash_auth'   => 'YOUR_AUTH_TOKEN',
 }
-brain01 = Boattr::Config.read('/root/boatmon/config.yml')
+brain01 = Boattr::Config.read('/root/boattr/config.yml')
 sensor_data = [{"name"=>"solar", "type"=>"current", "mode"=>"src", "raw"=>513, "value"=>0.11},
                {"name"=>"lights", "type"=>"current", "mode"=>"load", "raw"=>512, "value"=>0.0},
                {"name"=>"ring", "type"=>"current", "mode"=>"load", "raw"=>508, "value"=>-0.26},
