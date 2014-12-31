@@ -47,6 +47,7 @@ class boattr (
 
   file {"${boattr_dir}/config.yml":
     ensure  => present,
+    replace => 'no',
     content => template("${module_name}/boattr_config.yml"),
     require => Vcsrepo[$boattr_dir],
   }
