@@ -98,8 +98,6 @@ module Boattr
     def initialize(params)
       @graphite    = params['graphite']['host']
       @couchdb     = params['couchdb']['host']
-      @dashboard   = params['dashing']['host']
-      @dash_auth   = params['dashing']['auth']
       @@basename   = params['boattr']['basename']
       unless @graphite.nil? || @graphite.empty? then
         @g         = Graphite.new({:host => "#{@graphite}", :port => 2003})
@@ -253,8 +251,8 @@ module Boattr
   end
   class Dashing
     def initialize(params)
-      @dashboard   = params['dashboard']['host']
-      @dash_auth   = params['dashboard']['auth']
+      @dashboard   = params['dashing']['host']
+      @dash_auth   = params['dashing']['auth']
       
     end
     def to_dashboard(sensor_data)
