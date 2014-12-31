@@ -3,10 +3,10 @@ boattr:
    description: <%= @description %>
    i2cBus: "<%= @i2cBus %>"
    i2cAdcAddress: "<%= @i2cAdcAddress %>"
-database:
+couchdb:
    host: "<%= @db_host %>"
    dir:  "<%= @db_dir %>"
-dashboard:
+dashing:
    host: "<%= @dash_host %>"
    dir:  "<%= @dash_dir %>"   
    auth: "<%= @dash_auth %>"   
