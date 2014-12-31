@@ -11,7 +11,7 @@ class boattr::tor (
     ensure  => latest,
     require => Apt::Force['tor']
   }
-g
+
   apt::source { 'tor_apt_repo':
     location   => 'http://deb.torproject.org/torproject.org',
     repos      => 'main',
