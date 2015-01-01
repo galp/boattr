@@ -7,6 +7,8 @@ class boattr::params {
   $lan_subnet      = '192.168.8'
   $lan_ip          = "${lan_subnet}.1"
   $lan_iface       = 'br0'
+  $lan_gw          = undef
+  $lan_dns         = '127.0.0.1'
   $wan_iface       = 'usb0'
   $wired_iface     = 'eth0'
   $db_dir          = "${data_dir}/couchdb"
