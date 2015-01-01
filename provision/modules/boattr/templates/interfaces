@@ -29,6 +29,6 @@ iface br0 inet static
 	<% if @lan_gw %>
 	gateway <%= @lan_gw %>
 	<% end %>
-	<%= @lan_dns %>
+	dns-nameservers <%= @lan_dns %>
         bridge_ports <%= @wired_iface %>
 
