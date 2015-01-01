@@ -39,6 +39,7 @@ class boattr::tor (
   }
   service { 'tor' :
     ensure => running,
+    enable  => true,
     require => File['/etc/tor/torrc'],
   }
 }

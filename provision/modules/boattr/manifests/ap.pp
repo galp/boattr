@@ -10,8 +10,16 @@ class boattr::ap (
   $packages = ['hostapd', 'firmware-atheros', 'haveged']
   package {$packages : ensure => present }
   
-  service { 'hostapd' : ensure  => running, require => Package[$packages] }
-  service { 'haveged' : ensure  => running, require => Package[$packages] }
+  service { 'hostapd' :
+    ensure  => running,
+    enable  => true,
+    require => Package[$packages]
+  }
+  service { 'haveged' :
+    ensure  => running,
+    enable  => true,
+    require => Package[$packages]
+  }
 
   file {'/etc/hostapd/hostapd.conf' : 
     ensure  => present,

@@ -8,9 +8,12 @@ class boattr::dnsmasq (
   require boattr::apt
   $packages  = ['dnsmasq']
   package {$packages : ensure => present }
-  service { 'dnsmasq' : ensure  => running,
+  service { 'dnsmasq' :
+    ensure  => running,
+    enable  => true,
     require => Package[$packages]
   }
+
   file {'/etc/dnsmasq.conf' : 
     ensure  => present,
     content => template("${module_name}/dnsmasq.conf"),

@@ -27,6 +27,7 @@ class boattr::dashing (
   }
   service {'dashing' :
     ensure => running,
+    enable => true,
     require => [File['/etc/init.d/dashing'], Exec['install_dashing'],Package['nodejs']],
   }
 

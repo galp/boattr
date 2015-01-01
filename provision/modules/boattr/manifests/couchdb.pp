@@ -19,7 +19,8 @@ class boattr::couchdb (
     group  => 'couchdb',
   }
   service {'couchdb' :
-    ensure =>  running,
+    ensure => running,
+    enable => true,
     require => [ Package['couchdb'],File[$db_dir]]
   }
   cron { 'compact_couchdb_cron':
