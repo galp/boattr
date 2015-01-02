@@ -14,6 +14,7 @@ class boattr::interfaces (
       file {'/etc/network/interfaces' : 
         ensure  => present,
         content => template("${module_name}/interfaces"),
+        require => Package[$packages],
       }
     }
     'true' : { }
