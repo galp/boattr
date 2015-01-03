@@ -3,7 +3,7 @@ class boattr::params {
   $description     = 'boattr foo bar'
   $domain          = 'btr'
   $data_dir        = '/data'
-  $data_dev        = '68079340-4954-438a-935c-b57b0236313b'
+  $data_dev        = undef
   $lan_subnet      = '192.168.8'
   $lan_ip          = "${lan_subnet}.1"
   $lan_iface       = 'br0'
