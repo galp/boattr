@@ -60,7 +60,7 @@ class boattr (
     ensure => present,
     content => template("${module_name}/boattr_masq_sh.erb"),
     mode   => '0755',
-    notify => Exec['masq_sh_script']
+    #notify => Exec['masq_sh_script']
   }
   exec {'masq_sh_script' :
     command     => "${bin_dir}/${masq_script} ${lan_iface} ${wan_iface}",
