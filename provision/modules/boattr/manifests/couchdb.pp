@@ -6,7 +6,7 @@ class boattr::couchdb (
 {
   require boattr::apt
   package { 'couchdb' : ensure => installed}
-  package {'couchrest' : ensure   => installed, provider => gem }
+
   file {'/etc/couchdb/local.ini' : 
     ensure  => present,
     content => template("${module_name}/local.ini"),
