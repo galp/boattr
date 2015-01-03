@@ -1,11 +1,12 @@
 class boattr::dashing (
+  $basename               = $::boattr::params::basename,
   $dash_parent_dir         = $::boattr::params::dash_parent_dir,
   $dash_name               = $::boattr::params::dash_name,
   $dash_auth_token         = $::boattr::params::dash_auth_token,
 ) inherits boattr::params
 {
   require boattr::apt
-  $packages = ['nodejs','libv8-3.14.5','libc6-dev','libssl-dev','zlib1g-dev']
+  $packages = ['nodejs','libv8-3.14.5','libssl-dev','zlib1g-dev']
   package {'dashing' :
     ensure   => installed,
     provider => gem,
@@ -17,7 +18,6 @@ class boattr::dashing (
   }
   apt::force { 'libc6':
     release     => 'testing',
-    #require => Apt::Source['debian_unstable'],
   }
   file {'/etc/init.d/dashing' : 
     ensure  => present,
@@ -47,9 +47,15 @@ class boattr::dashing (
     notify   => Service['dashing'],
   }  
 
-  file { "${dash_parent_dir}/${dash_name}/dashboards/boattr.erb":
+  file { "${dash_parent_dir}/${dash_name}/dashboards/${basename}.erb":
     ensure  => present,
     content => template("${module_name}/dashing_dash.erb"),
     require => Exec['install_dashing']
   }
+  file { "${dash_parent_dir}/${dash_name}/config.ru":
+    ensure  => present,
+    content => template("${module_name}/dashing_config_ru.erb"),
+    require => Exec['install_dashing']
+  }
+
 }
