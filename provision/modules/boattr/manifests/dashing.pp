@@ -43,7 +43,7 @@ class boattr::dashing (
     command  => 'bundle',
     path     => $path,
     cwd      => "${dash_parent_dir}/${dash_name}",
-    creates  => "${dash_parent_dir}/${dash_name}",
+    creates  => "${dash_parent_dir}/${dash_name}/Gemfile.lock",
     require  => Exec['install_dashing'],
     notify   => Service['dashing'],
   }  
