@@ -1,5 +1,6 @@
 class boattr::users (
-  $devel = false)
+  $devel       = $::boattr::params::devel,
+  $boattr_user = $::boattr::params::boattr_user)
 {
   case $devel {
     true: {
@@ -14,5 +15,9 @@ class boattr::users (
   }
   @user { boattr: ensure => present }
   user { debian: ensure => absent }
+  file { "${boattr_user}/.gemrc" :
+    ensure   => file,
+    content  => 'gem: --no-ri --no-rdoc',
+  }
 }
 

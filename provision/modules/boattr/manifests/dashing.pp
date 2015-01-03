@@ -37,6 +37,7 @@ class boattr::dashing (
     cwd      => $dash_parent_dir,
     creates  => "${dash_parent_dir}/${dash_name}",
     require  => Package['dashing'],
+    notify   => Exec['bundle_dashing'],
   }  
   exec {'bundle_dashing' :
     command  => 'bundle',
