@@ -2,7 +2,7 @@ class boattr::dashing (
   $dash_parent_dir         = $::boattr::params::dash_parent_dir,
   $dash_name               = $::boattr::params::dash_name,
   $dash_auth_token         = $::boattr::params::dash_auth_token,
-)
+) inherits boattr::params
 {
   require boattr::apt
   $packages = ['nodejs','libv8-3.14.5','libc6-dev','libssl-dev','zlib1g-dev']

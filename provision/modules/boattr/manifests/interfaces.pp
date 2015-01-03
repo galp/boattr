@@ -5,6 +5,7 @@ class boattr::interfaces (
   $lan_dns      = $::boattr::params::lan_dns,
   ) inherits boattr::params
 {
+  require boattr::apt
   $packages = ['bridge-utils']
   package {$packages : ensure => present }
   

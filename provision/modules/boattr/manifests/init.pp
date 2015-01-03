@@ -20,6 +20,7 @@ class boattr (
   $with_tor      = $::boattr::params::with_tor,
   ) inherits boattr::params
 {
+  require boattr::packages
   if $with_tor {
     class { 'boattr::tor': lan_ip => $lan_ip }
   }
