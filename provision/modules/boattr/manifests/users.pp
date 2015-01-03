@@ -1,6 +1,7 @@
 class boattr::users (
   $devel       = $::boattr::params::devel,
-  $boattr_user = $::boattr::params::boattr_user)
+  $boattr_user = $::boattr::params::boattr_user
+  ) inherits boattr::params
 {
   case $devel {
     true: {

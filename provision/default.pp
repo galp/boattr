@@ -29,7 +29,7 @@ node brain02 {
 
 }
 node boattr-vagrant {
-  $ip         = "192.168.8.52"
+  $ip         = '192.168.8.200'
   class { 'ntp': iburst_enable => true }
 
   class { 'boattr::packages':  devel => true } -> class { 'boattr::users': } -> class { 'boattr': lan_ip => $ip} -> class { 'boattr::dashing': }
