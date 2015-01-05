@@ -30,12 +30,13 @@ node brain02 {
 
 }
 node boattr-vagrant {
-  $ip         = '192.168.8.200'
-  $lan_gw     = '192.168.8.1'
+  $ip          = '192.168.8.200'
+  $lan_gw      = '192.168.8.1'
+  $wired_iface = 'eth1'
   class { 'ntp': iburst_enable => true }
-  class { 'boattr::packages':  devel => true } -> class { 'boattr::users': } -> class { 'boattr': lan_ip => $ip} -> class { 'boattr::dashing': }
-  class { 'boattr::interfaces': lan_ip => $ip, wired_iface => 'eth1', lan_gw => $lan_gw } -> class { 'boattr::dnsmasq': } ->   class { 'boattr::ap' : }
-  class { 'boattr::storage':  } -> class { 'boattr::couchdb': }
+  class { 'boattr::packages': } -> class { 'boattr::users': } -> class { 'boattr': lan_ip => $ip} ->   class { 'boattr::storage':  } -> class { 'boattr::couchdb': } -> class { 'boattr::dashing': }
+  class { 'boattr::interfaces': lan_ip => $ip, wired_iface => $wired_iface, lan_gw => $lan_gw } -> class { 'boattr::dnsmasq': } ->   class { 'boattr::ap' : }
 
+  
   
 }

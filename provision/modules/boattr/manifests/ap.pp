@@ -20,16 +20,9 @@ class boattr::ap (
     enable  => true,
     require => Package[$packages]
   }
-
   file {'/etc/hostapd/hostapd.conf' : 
     ensure  => present,
     content => template("${module_name}/hostapd.conf"),
-    notify  => Service['hostapd'],
-    require => Package[$packages],
-  }
-  file {'/etc/default/hostapd' : 
-    ensure  => present,
-    content => template("${module_name}/hostapd"),
     notify  => Service['hostapd'],
     require => Package[$packages],
   }

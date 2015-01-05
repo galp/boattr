@@ -36,7 +36,6 @@ class boattr::apt {
     location          => 'http://security.debian.org/',
     release           => "${::lsbdistcodename}/updates",
     repos             => 'main contrib non-free',
-    required_packages => 'debian-keyring debian-archive-keyring',
     include_deb       => true
   }
   apt::source { 'beaglebone_debian':

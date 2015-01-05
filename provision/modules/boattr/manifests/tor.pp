@@ -5,7 +5,7 @@ class boattr::tor (
   $lan_ip             = $::boattr::params::lan_ip
   ) inherits boattr::params
 {
-  
+
   $packagelist = ['tor','tor-geoipdb']
   package { $packagelist :
     ensure  => latest,
@@ -18,7 +18,7 @@ class boattr::tor (
     key        => '886DDD89',
   }
   apt::force { 'tor':
-    release     => 'testing',
+    release => 'testing',
     require => Apt::Source['tor_apt_repo']
   }
 
@@ -38,7 +38,7 @@ class boattr::tor (
     }
   }
   service { 'tor' :
-    ensure => running,
+    ensure  => running,
     enable  => true,
     require => File['/etc/tor/torrc'],
   }

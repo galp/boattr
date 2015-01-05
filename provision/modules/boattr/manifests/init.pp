@@ -1,5 +1,6 @@
 class boattr (
   $boattr_dir    = $::boattr::params::boattr_dir,
+  $boattr_repo   = $::boattr::params::boattr_repo,
   $basename      = $::boattr::params::basename,
   $description   = $::boattr::params::description,
   $i2cBus        = $::boattr::params::i2cBus,
@@ -23,21 +24,22 @@ class boattr (
   require boattr::packages
   if $with_tor {
     class { 'boattr::tor': lan_ip => $lan_ip }
+    notice('tor gateway is enabled')
   }
-  
+
   vcsrepo { $boattr_dir:
     ensure   => present,
     provider => git,
-    source   => "git://github.com/galp/boattr.git",
+    source   => $boattr_repo
   }
   exec {'bundle_boattr' :
     command  => 'bundle',
-    path     => $path,
+    path     => $::path,
     cwd      => $boattr_dir,
     creates  => "${boattr_dir}/Gemfile.lock",
     require  => Vcsrepo[$boattr_dir],
     #notify   => Service['dashing'],
-  }  
+  }
 
   cron { 'boattr_run':
     command => "ruby ${boattr_dir}/${boattr_run}.rb >  /run/${basename}.log  2>&1",
@@ -52,15 +54,14 @@ class boattr (
     content => template("${module_name}/boattr_config.yml"),
     require => Vcsrepo[$boattr_dir],
   }
-  file {"/lib/firmware/BB-W1-00A0.dtbo":
+  file {'/lib/firmware/BB-W1-00A0.dtbo':
     ensure => present,
     source => 'puppet:///modules/boattr/BB-W1-00A0.dtbo'
   }
   file {"${bin_dir}/${masq_script}":
-    ensure => present,
+    ensure  => present,
     content => template("${module_name}/boattr_masq_sh.erb"),
-    mode   => '0755',
-    #notify => Exec['masq_sh_script']
+    mode    => '0755',
   }
   exec {'masq_sh_script' :
     command     => "${bin_dir}/${masq_script} ${lan_iface} ${wan_iface}",
@@ -71,7 +72,7 @@ class boattr (
     ensure  => present,
     line    => "echo BB-W1:00A0 > $cape_slots",
     path    => '/etc/rc.local',
-    require => [File["/lib/firmware/BB-W1-00A0.dtbo"],File_line['remove_exit']],
+    require => [File['/lib/firmware/BB-W1-00A0.dtbo'],File_line['remove_exit']],
   }
 
   file_line { 'remove_exit' :
@@ -83,7 +84,7 @@ class boattr (
     ensure  => present,
     line    => "${bin_dir}/${masq_script} ${lan_iface} ${wan_iface}",
     path    => '/etc/rc.local',
-    require => [File["/lib/firmware/BB-W1-00A0.dtbo"],File["${bin_dir}/${masq_script}"],File_line['remove_exit']],
+    require => [File['/lib/firmware/BB-W1-00A0.dtbo'],File["${bin_dir}/${masq_script}"],File_line['remove_exit']],
     }
 
 }

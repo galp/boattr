@@ -1,31 +1,26 @@
 class boattr::packages (
-  $devel = false
-)
+  $devel = $::boattr::params::devel,
+  ) inherits boattr::params
 {
   require boattr::apt
-  
+
   $packagelist     = [ 'screen', 'mosh','iptables','curl']
   $rubypackagelist = [ 'ruby','bundler','ruby-dev','rubygems','build-essential','libc6-dev']
   $devpackagelist  = ['i2c-tools','emacs24-nox', 'puppet-el']
 
-  package { $packagelist :
-    ensure => installed,
-  }
-  apt::force { $rubypackagelist:
-    release     => 'testing',
-  }
+  apt::force { $rubypackagelist: release => 'testing' }
+  package { $packagelist : ensure => installed }
 
-  package { $rubypackagelist :
-    ensure => installed,
-    require => Apt::Force[$rubypackagelist],
-  }
-  
   case $devel {
-    'true': {
+    true: {
+      notice('With some handy  packages')
+      apt::force { $devpackagelist: release => 'testing' }
+    }
+    false: {
       package { $devpackagelist :
-        ensure => installed,
+        ensure => absent,
       }
     }
-    'false' : { }
+    default: {}
   }
 }
