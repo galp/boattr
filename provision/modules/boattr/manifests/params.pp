@@ -6,6 +6,7 @@ class boattr::params {
   $domain          = 'btr'
   $data_dir        = '/data'
   $data_dev        = undef
+  $data_fs_type    = 'ext4'
   $lan_subnet      = '192.168.8'
   $lan_ip          = "${lan_subnet}.1"
   $lan_iface       = 'br0'
