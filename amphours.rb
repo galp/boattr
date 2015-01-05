@@ -8,26 +8,24 @@ brain01 = {
   'couchdb'     => '192.168.8.1',
   'dashboard'   => '192.168.8.1',
   'graphite'    => '10.70.60.1',
-  'dash_auth'   => 'YOUR_AUTH_TOKEN',
+  'dash_auth'   => 'YOUR_AUTH_TOKEN'
 }
 brain01 = Boattr::Config.read('/root/boattr/config.yml')
-sensor_data = [{"name"=>"solar", "type"=>"current", "mode"=>"src", "raw"=>513, "value"=>0.11},
-               {"name"=>"lights", "type"=>"current", "mode"=>"load", "raw"=>512, "value"=>0.0},
-               {"name"=>"ring", "type"=>"current", "mode"=>"load", "raw"=>508, "value"=>-0.26},
-               {"name"=>"out", "address"=>"10-000802964c0d", "type"=>"temp", "value"=>2.31},
-               {"name"=>"in", "address"=>"10-0008029674ee", "type"=>"temp", "value"=>16.81},
-               {"name"=>"stove", "address"=>"10-00080296978d", "type"=>"temp", "value"=>46.31},
-               {"name"=>"cylinder", "address"=>"10-00080296978d", "type"=>"temp", "value"=>46.31},
+sensor_data = [{ 'name' => 'solar', 'type' => 'current', 'mode' => 'src' },
+               { 'name' => 'lights', 'type' => 'current', 'mode' => 'load' },
+               { 'name' => 'ring', 'type' => 'current', 'mode' => 'load' },
+               { 'name' => 'out', 'address' => '10-000802964c0d', 'type' => 'temp' },
+               { 'name' => 'in', 'address' => '10-0008029674ee', 'type' => 'temp' },
+               { 'name' => 'stove', 'address' => '10-00080296978d', 'type' => 'temp' },
+               { 'name' => 'cylinder', 'address' => '10-00080296978d', 'type' => 'temp' }
               ]
 
-@week  = 720 # 1 week 
+@week  = 720 # 1 week
 @hours = 24
 a = Boattr::Data.new(brain01)
 
-@boat_amph = a.amphours(sensor_data,@hours)
+@boat_amph = a.amphours(sensor_data, @hours)
 @balance  = a.amphourBalance(@boat_amph)
 @balance.concat(@boat_amph)
-d = Boattr::Dashing.new(brain01) 
-d.list_to_dashboard(@balance,'amphours')
-
-
+d = Boattr::Dashing.new(brain01)
+d.list_to_dashboard(@balance, 'amphours')
