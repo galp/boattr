@@ -2,7 +2,7 @@ class boattr::dashing (
   $basename               = $::boattr::params::basename,
   $dash_parent_dir         = $::boattr::params::dash_parent_dir,
   $dash_name               = $::boattr::params::dash_name,
-  $dash_auth_token         = $::boattr::params::dash_auth_token,
+  $dash_auth_token         = $::boattr::params::dash_auth,
 ) inherits boattr::params
 {
   require boattr::apt
