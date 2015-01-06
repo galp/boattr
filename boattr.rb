@@ -16,9 +16,9 @@ module Boattr
     @@data = []
     @@device
     @@OWdevices = []
-    attr_reader :location, :i2cAddress, :i2cBus, :data, :basename
+    attr_reader: :i2cAddress, :i2cBus, :data, :basename
     def initialize(params)
-      @@basename    = params['boattr']['basename']
+      @basename    = params['boattr']['basename']
       @i2cAdcAddress   = params['boattr']['i2cAdcAddress']
       @@device      = ::I2C.create(params['boattr']['i2cBus'])
       readI2cADC(@i2cAdcAddress)
@@ -99,16 +99,17 @@ module Boattr
   end
 
   class Data
+    attr_reader: :basename
     def initialize(params)
       @graphite    = params['graphite']['host']
       @couchdb     = params['couchdb']['host']
-      @@basename   = params['boattr']['basename']
+      @basename    = params['boattr']['basename']
       unless @graphite.nil? || @graphite.empty?
         @g         = Graphite.new(host: "#{@graphite}", port: 2003)
       end
       unless @couchdb.nil? || @couchdb.empty?
-        @sensorsdb = CouchRest.database!("http://#{@couchdb}:5984/#{@@basename}-sensors")
-        @statsdb   = CouchRest.database!("http://#{@couchdb}:5984/#{@@basename}-stats")
+        @sensorsdb = CouchRest.database!("http://#{@couchdb}:5984/#{@basename}-sensors")
+        @statsdb   = CouchRest.database!("http://#{@couchdb}:5984/#{@basename}-stats")
       end
     end
 
@@ -221,9 +222,8 @@ module Boattr
     end
 
     def to_graphite(sensor_data)
-      @base  = @@basename
-      @data  = sensor_data
-      # p "#{@base}.#{@type}.#{@name} #{@value} #{@g.time_now}"
+      @basename  = self.basename
+      @data      = sensor_data
       @data.each do |x|
         if x.nil?
           next
@@ -232,7 +232,7 @@ module Boattr
         @name  = x['name']
         @value = x['value']
         @g.push_to_graphite do |graphite|
-          graphite.puts "#{@base}.#{@type}.#{@name} #{@value} #{@g.time_now}"
+          graphite.puts "#{@basename}.#{@type}.#{@name} #{@value} #{@g.time_now}"
         end
       end
     end
