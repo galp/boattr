@@ -41,10 +41,8 @@ module Boattr
       @data_set.each_with_index do |d, _i|
         # sort and remove max and min
         d = d.sort
-        d.pop
-        d.pop
-        d.shift
-        d.shift
+        d.pop(2)
+        d.shift(2)
         @data << d.inject { |sum, x| sum + x } / (@iterate - 4)
       end
     end
@@ -91,7 +89,6 @@ module Boattr
     end
 
   end
-
 
   class Data
     attr_reader :basename
