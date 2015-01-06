@@ -2,60 +2,45 @@ require '/root/boattr/boattr.rb'
 hostname = Socket.gethostname
 p hostname
 
-brain01 = Boattr::Config.read('/root/boattr/config.yml')
+config = Boattr::Config.read('/root/boattr/config.yml')
 
-sensors=Boattr::Sensors.new(brain01)
-dataAllowance = Boattr::Data.new(brain01).get_remaining_data('ee') 
+sensors=Boattr::Sensors.new(config)
+allowance = Boattr::Data.new(config)
 
-@current_sensors = [ 
-                   sensors.current('solar',0,model='acs714',type='src'), 
-                   sensors.current('genny',1,model='acs709',type='src'), 
-                   sensors.current('lights',2,model='acs714',type='load'),
-                   #sensors.current('pumps',3),
-                   sensors.current('ring',4,model='acs714',type='load'),
-                   sensors.current('fridge',5,model='acs714',type='load'),
-                  ]
-@cylinder_temp = sensors.temperature('cylinder','10-000802961f0d')
-@stove_temp    = sensors.temperature('stove','10-00080296978d')
+@current_sensor_data = []
+@temp_sensor_data    = []
+@sensor_data         = []
 
-@temp_sensors = [ sensors.temperature('in','10-0008029674ee'),
-                  sensors.temperature('out','10-000802964c0d'),
-                  @cylinder_temp,
-                  @stove_temp,
-                  sensors.temperature('canal','28-000004ee99a8'), 
-                  sensors.temperature('bath','28-000005661bfa'), 
-                  #sensors.temperature('one','28-0000056b2c1a'), 
-                  #sensors.temperature('two','28-000005657712'), 
-                  sensors.temperature('bed','28-00000566f3b8'), 
-                ]
 
-@brain01_sensors = [ 
-                   sensors.voltage('batteries',6),
-                   #sensors.waterlevel('tank',7),
-                   dataAllowance,
+config['sensors']['temp'].each() do |k,v|
+  @temp_sensor_data <<  sensors.temperature(k,v['address'])
+end
+config['sensors']['current'].each() do |k,v|
+  @current_sensor_data  <<  sensors.current(k,v['address'],model=v['model'],type=v['type'])
+end
+
+@misc_sensor_data = [ 
+  sensors.voltage('batteries',6),
+  allowance.get_remaining_data('ee') ,
 ]
 
-@brain01_sensors.concat(@current_sensors)
-@brain01_sensors.concat(@temp_sensors)
+@sensor_data.concat(@current_sensor_data)
+@sensor_data.concat(@temp_sensor_data)
+@sensor_data.concat(@misc_sensor_data)
 
-Boattr::Data.new(brain01).to_db(@brain01_sensors)
-Boattr::Data.new(brain01).to_graphite(@brain01_sensors)
+Boattr::Data.new(config).to_db(@sensor_data)
+Boattr::Data.new(config).to_graphite(@sensor_data)
 
-@hours = 24
+dash = Boattr::Dashing.new(config)
+dash.list_to_dashboard(@current_sensor_data,'amps')
+dash.list_to_dashboard(@temp_sensor_data,'temps')
+dash.to_dashboard(@sensor_data)
+
+@stove_temp = @temp_sensor_data[3]['value']
+@cylinder_temp = @temp_sensor_data[2]['value']
+Boattr::Control.new().pump('calorifier pump', @stove_temp, @cylinder_temp, 30, 40, 22)
 
 
-@boat_amph = Boattr::Data.new(brain01).amphours(@brain01_sensors,@hours)
-@balance   = Boattr::Data.new(brain01).amphourBalance(@boat_amph)
-@balance.concat(@boat_amph)
-
-
-
-dash = Boattr::Dashing.new(brain01)
-dash.list_to_dashboard(@current_sensors,'amps')
-dash.list_to_dashboard(@temp_sensors,'temps')
-dash.to_dashboard(@brain01_sensors)
-
-Boattr::Control.new().pump('calorifier pump',@stove_temp['value'],@cylinder_temp['value'],30,40,22)
 
 
 
