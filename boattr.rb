@@ -14,25 +14,23 @@ require 'nokogiri'
 module Boattr
   class Sensors
     @@data = []
-    @@device
-    @@OWdevices = []
-    attr_reader: :i2cAddress, :i2cBus, :data, :basename
+    attr_reader :i2c_adc_address, :i2c_device, :data, :basename, :onewire_devices
     def initialize(params)
-      @basename    = params['boattr']['basename']
-      @i2cAdcAddress   = params['boattr']['i2cAdcAddress']
-      @@device      = ::I2C.create(params['boattr']['i2cBus'])
-      readI2cADC(@i2cAdcAddress)
-      onewire
+      @basename        = params['boattr']['basename']
+      @i2c_adc_address = params['boattr']['i2cAdcAddress']
+      @i2c_device      = ::I2C.create(params['boattr']['i2cBus'])
+      read_i2c_adc(@i2c_adc_address)
+      read_onewire_bus
     end
 
-    def readI2cADC(address)
+    def read_i2c_adc(address)
       @address = address
       @iterate = 16
       @data    = Array.new(10) { Array.new }
       @samples = []
       @iterate.times do # we take @iterate samples
         # read 20 bytes from slave, convert to decimals, and finaly in 10bit values.
-        @adc = @@device.read(@address, 0x14, 0x00).unpack('C*').map { |e| e.to_s 10 }
+        @adc = self.i2c_device.read(@address, 0x14, 0x00).unpack('C*').map { |e| e.to_s 10 }
         sleep(0.1)
         # slice the 20 byte array into pairs (MSB,LSB) and convert decimal.
         @adc.each_slice(2) { |a| @samples << a[0].to_i * 256 + a[1].to_i }
@@ -53,11 +51,11 @@ module Boattr
       @@data
     end
 
-    def onewire
+    def read_onewire_bus
       @basedir  = '/sys/bus/w1/devices/'
       Dir.chdir(@basedir)
-      @@OWdevices = Dir['*-*']
-      @@OWdevices
+      @onewire_devices = Dir['*-*']
+      @onewire_devices
     end
 
     def voltage(name, address)
@@ -88,7 +86,7 @@ module Boattr
       @name     = name
       @address  = address
       @basedir  = '/sys/bus/w1/devices/'
-      if @@OWdevices.include?(@address)
+      if self.onewire_devices.include?(@address)
         file = File.open("#{@basedir}/#{address}/w1_slave", 'r')
         if file.readline.include?('YES') ## Is CRC valid in the first line? lets read the second and extract the temp
           @temp = file.readline.split[-1].split('=')[-1].to_i / 1000.0
@@ -99,7 +97,7 @@ module Boattr
   end
 
   class Data
-    attr_reader: :basename
+    attr_reader :basename
     def initialize(params)
       @graphite    = params['graphite']['host']
       @couchdb     = params['couchdb']['host']
@@ -223,6 +221,7 @@ module Boattr
 
     def to_graphite(sensor_data)
       @basename  = self.basename
+      p @basename
       @data      = sensor_data
       @data.each do |x|
         if x.nil?
