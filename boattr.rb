@@ -183,7 +183,7 @@ module Boattr
       end
     end
 
-    def amphours(sensor_data, hours = 12)
+    def amphours(sensor_data, hours = 24)
       @data  = sensor_data
       @hours = hours
       @from = Time.now.to_i - @hours * 60 * 60
