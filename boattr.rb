@@ -13,7 +13,6 @@ require 'nokogiri'
 
 module Boattr
   class Sensors
-    @@data = []
     attr_reader :i2c_adc_address, :i2c_device, :data, :basename, :onewire_devices
     def initialize(params)
       @basename        = params['boattr']['basename']
@@ -24,43 +23,41 @@ module Boattr
     end
 
     def read_i2c_adc(address)
-      @address = address
-      @iterate = 16
-      @data    = Array.new(10) { Array.new }
-      @samples = []
+      @address  = address
+      @iterate  = 16
+      @data_set = Array.new(10) { Array.new }
+      @adc_samples = []
+      @data        = []
       @iterate.times do # we take @iterate samples
         # read 20 bytes from slave, convert to decimals, and finaly in 10bit values.
         @adc = self.i2c_device.read(@address, 0x14, 0x00).unpack('C*').map { |e| e.to_s 10 }
         sleep(0.1)
         # slice the 20 byte array into pairs (MSB,LSB) and convert decimal.
-        @adc.each_slice(2) { |a| @samples << a[0].to_i * 256 + a[1].to_i }
-        # p @samples
-        @data.each_with_index { |d, i| d << @samples[i] }
-        @samples = []
+        @adc.each_slice(2) { |a| @adc_samples << a[0].to_i * 256 + a[1].to_i }
+        @data_set.each_with_index { |d, i| d << @adc_samples[i] }
+        @adc_samples = []
       end
       # take the average (array.inject(:+) ? )
-      @data.each_with_index do |d, _i|
+      @data_set.each_with_index do |d, _i|
         # sort and remove max and min
         d = d.sort
         d.pop
         d.pop
         d.shift
         d.shift
-        @@data << d.inject { |sum, x| sum + x } / (@iterate - 4)
+        @data << d.inject { |sum, x| sum + x } / (@iterate - 4)
       end
-      @@data
     end
 
     def read_onewire_bus
       @basedir  = '/sys/bus/w1/devices/'
       Dir.chdir(@basedir)
       @onewire_devices = Dir['*-*']
-      @onewire_devices
     end
 
     def voltage(name, address)
       @name    = name
-      @raw     = @@data[address]
+      @raw     = self.data[address]
       @volts = @raw * 0.015357
       { 'name' => @name, 'type' => 'volts', 'raw' => @raw, 'value' => @volts.round(2) }
     end
@@ -70,7 +67,7 @@ module Boattr
       @name    = name
       @mode    = mode
       @divider = @supported_models[model]
-      @raw     = @@data[address]
+      @raw     = self.data[address]
       @volts   = (@raw * 0.004887)
       if mode == 'src' && @volts < 2.5 # a source should not show negative values.
         @volts = 2.5
