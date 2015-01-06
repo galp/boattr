@@ -30,7 +30,7 @@ module Boattr
       @data        = []
       @iterate.times do # we take @iterate samples
         # read 20 bytes from slave, convert to decimals, and finaly in 10bit values.
-        @adc = self.i2c_device.read(@address, 0x14, 0x00).unpack('C*').map { |e| e.to_s 10 }
+        @adc = i2c_device.read(@address, 0x14, 0x00).unpack('C*').map { |e| e.to_s 10 }
         sleep(0.1)
         # slice the 20 byte array into pairs (MSB,LSB) and convert decimal.
         @adc.each_slice(2) { |a| @adc_samples << a[0].to_i * 256 + a[1].to_i }
@@ -83,15 +83,15 @@ module Boattr
       @name     = name
       @address  = address
       @basedir  = '/sys/bus/w1/devices/'
-      if self.onewire_devices.include?(@address)
-        file = File.open("#{@basedir}/#{address}/w1_slave", 'r')
-        if file.readline.include?('YES') ## Is CRC valid in the first line? lets read the second and extract the temp
-          @temp = file.readline.split[-1].split('=')[-1].to_i / 1000.0
-          return { 'name' => @name, 'type' => 'temp', 'address' => @address,  'value' => @temp.round(2) }
-        end
-      end
+      return unless self.onewire_devices.include?(@address)
+      @file = File.open("#{@basedir}/#{address}/w1_slave", 'r')
+      return unless @file.readline.include?('YES') # Is CRC valid in the first line?
+      @temp = @file.readline.split[-1].split('=')[-1].to_i / 1000.0
+      { 'name' => @name, 'type' => 'temp', 'address' => @address,  'value' => @temp.round(2) }
     end
+
   end
+
 
   class Data
     attr_reader :basename
@@ -111,9 +111,7 @@ module Boattr
     def to_db(sensor_data)
       @data  = sensor_data
       @data.each do |x|
-        if x.nil?
-          next
-        end
+        next if x.nil?
         p x
         @doc = { '_id' => now }.merge x
         @sensorsdb.save_doc(@doc)
@@ -125,9 +123,7 @@ module Boattr
       @data       = sensor_data
       @views      = {}
       @data.each do |x|
-        if x.nil?
-          next
-        end
+        next if x.nil?
         @name  = x['name']
         @type  = x['type']
         @view  = { "#{@name}".to_sym => {
@@ -202,7 +198,7 @@ module Boattr
       @merged
     end
 
-    def amphourBalance(amphours_data)
+    def amphour_balance(amphours_data)
       @loads, @sources = 0, 0
       @amphours       = amphours_data
       @amphours.each do |x|
@@ -221,9 +217,7 @@ module Boattr
       p @basename
       @data      = sensor_data
       @data.each do |x|
-        if x.nil?
-          next
-        end
+        next if x.nil?
         @type  = x['type']
         @name  = x['name']
         @value = x['value']
@@ -265,9 +259,7 @@ module Boattr
     def to_dashboard(sensor_data)
       @data = sensor_data
       @data.each do |x|
-        if x.nil?
-          next
-        end
+        next if x.nil?
         @type  = x['type']
         @name  = x['name']
         @value = x['value']
@@ -320,11 +312,6 @@ module Boattr
         p "#{@name} on,  stove :#{@stove_temp}, cal : #{@cal_temp}"
         @pump.off # confusing as relays LOW is ON
       end
-    end
-  end
-  class Camera
-    def camera(_device)
-      # take a snapshot, upload to db
     end
   end
 end
