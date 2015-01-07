@@ -304,13 +304,13 @@ module Boattr
       @pin         = pin
       @cal_thres   = cal_thres
       @stove_thres = stove_thres
-      @pump = ::GPIO::OutputPin.new(device: :BeagleboneBlack, pin: @pin)
+      @pump = ::GPIO::Relay.new(device: :BeagleboneBlack, pin: @pin)
       if @cal_temp.nil? || @stove_temp.nil? ||  @stove_temp < @stove_thres || @cal_temp > @cal_thres
         puts "#{@name} off,  stove :#{@stove_temp}, cal : #{@cal_temp}"
-        @pump.on # confusing as relays LOW is OFF
+        @pump.off 
       else
         p "#{@name} on,  stove :#{@stove_temp}, cal : #{@cal_temp}"
-        @pump.off # confusing as relays LOW is ON
+        @pump.on 
       end
     end
   end
