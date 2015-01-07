@@ -55,7 +55,7 @@ module Boattr
 
     def voltage(name, address)
       @name    = name
-      @raw     = self.data[address]
+      @raw     = data[address]
       @volts = @raw * 0.015357
       { 'name' => @name, 'type' => 'volts', 'raw' => @raw, 'value' => @volts.round(2) }
     end
@@ -65,25 +65,24 @@ module Boattr
       @name    = name
       @mode    = mode
       @divider = @supported_models[model]
-      @raw     = self.data[address]
+      @raw     = data[address]
       @volts   = (@raw * 0.004887)
       # a load should only be negative and  a source should be possitive
       @volts   = 2.5 if @mode == 'src' && @volts < 2.5 || @mode == 'load' && @volts > 2.5
       @amps    = (@volts - 2.5) / @divider
       { 'name' => @name, 'type' => 'current', 'mode' => @mode, 'raw' => @raw, 'value' => @amps.round(2) }
     end
-    
+
     def temperature(name, address)
       @name     = name
       @address  = address
       @basedir  = '/sys/bus/w1/devices/'
-      return unless self.onewire_devices.include?(@address)
+      return unless onewire_devices.include?(@address)
       @file = File.open("#{@basedir}/#{address}/w1_slave", 'r')
       return unless @file.readline.include?('YES') # Is CRC valid in the first line?
       @temp = @file.readline.split[-1].split('=')[-1].to_i / 1000.0
       { 'name' => @name, 'type' => 'temp', 'address' => @address,  'value' => @temp.round(2) }
     end
-
   end
 
   class Data
@@ -202,12 +201,12 @@ module Boattr
           @loads += x['value']
         end
       end
-      [{ 'name' => 'sources', 'type' => 'amphours', 'hours' => @hours, 'value' => @sources.round(2) }, 
+      [{ 'name' => 'sources', 'type' => 'amphours', 'hours' => @hours, 'value' => @sources.round(2) },
        { 'name' => 'loads', 'type' => 'amphours', 'hours' => @hours, 'value' => @loads.round(2) }]
     end
 
     def to_graphite(sensor_data)
-      @basename  = self.basename
+      @basename  = basename
       p @basename
       @data      = sensor_data
       @data.each do |x|
@@ -259,11 +258,11 @@ module Boattr
         @name  = x['name']
         @value = x['value']
         HTTParty.post("http://#{@host}:3030/widgets/#{@type}#{@name}",
-                      body: { 
-                        auth_token: "#{@dash_auth}", 
-                        current: @value, 
-                        moreinfo: @type, 
-                        title: @name}.to_json
+                      body: {
+                        auth_token: "#{@dash_auth}",
+                        current: @value,
+                        moreinfo: @type,
+                        title: @name }.to_json
                       )
       end
     end
@@ -280,10 +279,10 @@ module Boattr
         @items << { label: @name, value: @value }
       end
       HTTParty.post("http://#{@host}:3030/widgets/#{@widget}",
-                    body: { 
-                      auth_token: "#{@dash_auth}", 
-                      items: @items, 
-                      moreinfo: "last #{@hours} hours", 
+                    body: {
+                      auth_token: "#{@dash_auth}",
+                      items: @items,
+                      moreinfo: "last #{@hours} hours",
                       title: @widget }.to_json
                     )
     end
@@ -300,8 +299,8 @@ module Boattr
   class Control
     def pump(name, stove_temp, cal_temp, pin, stove_thres = 40, cal_thres = 22)
       @name  = name
-      @stove_temp = stove_temp 
-      @cal_temp    = cal_temp 
+      @stove_temp = stove_temp
+      @cal_temp    = cal_temp
       @pin         = pin
       @cal_thres   = cal_thres
       @stove_thres = stove_thres
