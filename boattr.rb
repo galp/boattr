@@ -67,16 +67,12 @@ module Boattr
       @divider = @supported_models[model]
       @raw     = self.data[address]
       @volts   = (@raw * 0.004887)
-      if mode == 'src' && @volts < 2.5 # a source should not show negative values.
-        @volts = 2.5
-      end
-      if mode == 'load' && @volts > 2.5 # a load should not show possitive values
-        @volts = 2.5
-      end
+      # a load should only be negative and  a source should be possitive
+      @volts   = 2.5 if @mode == 'src' && @volts < 2.5 || @mode == 'load' && @volts > 2.5
       @amps    = (@volts - 2.5) / @divider
       { 'name' => @name, 'type' => 'current', 'mode' => @mode, 'raw' => @raw, 'value' => @amps.round(2) }
     end
-
+    
     def temperature(name, address)
       @name     = name
       @address  = address
@@ -206,7 +202,8 @@ module Boattr
           @loads += x['value']
         end
       end
-      [{ 'name' => 'sources', 'type' => 'amphours', 'hours' => @hours, 'value' => @sources.round(2) }, { 'name' => 'loads', 'type' => 'amphours', 'hours' => @hours, 'value' => @loads.round(2) }]
+      [{ 'name' => 'sources', 'type' => 'amphours', 'hours' => @hours, 'value' => @sources.round(2) }, 
+       { 'name' => 'loads', 'type' => 'amphours', 'hours' => @hours, 'value' => @loads.round(2) }]
     end
 
     def to_graphite(sensor_data)
@@ -248,9 +245,10 @@ module Boattr
     end
   end
   class Dashing
+    attr_reader :host
     def initialize(params)
-      @dashboard   = params['dashing']['host']
-      @dash_auth   = params['dashing']['auth']
+      @host      = params['dashing']['host']
+      @dash_auth = params['dashing']['auth']
     end
 
     def to_dashboard(sensor_data)
@@ -260,8 +258,13 @@ module Boattr
         @type  = x['type']
         @name  = x['name']
         @value = x['value']
-        HTTParty.post("http://#{@dashboard}:3030/widgets/#{@type}#{@name}",
-                      body: { auth_token: "#{@dash_auth}", current: @value, moreinfo: @type, title: @name }.to_json)
+        HTTParty.post("http://#{@host}:3030/widgets/#{@type}#{@name}",
+                      body: { 
+                        auth_token: "#{@dash_auth}", 
+                        current: @value, 
+                        moreinfo: @type, 
+                        title: @name}.to_json
+                      )
       end
     end
 
@@ -270,17 +273,19 @@ module Boattr
       @widget = widget
       @items  = []
       @data.each do |x|
-        if x.nil?
-          next
-        end
+        next if x.nil?
         @name  = x['name']
         @value = x['value']
         @hours = x['hours']
-        @type  = x['type']
         @items << { label: @name, value: @value }
       end
-      HTTParty.post("http://#{@dashboard}:3030/widgets/#{@widget}",
-                    body: { auth_token: "#{@dash_auth}", items: @items, moreinfo: "last #{@hours} hours", title: @widget }.to_json)
+      HTTParty.post("http://#{@host}:3030/widgets/#{@widget}",
+                    body: { 
+                      auth_token: "#{@dash_auth}", 
+                      items: @items, 
+                      moreinfo: "last #{@hours} hours", 
+                      title: @widget }.to_json
+                    )
     end
   end
   class Config
@@ -295,9 +300,8 @@ module Boattr
   class Control
     def pump(name, stove_temp, cal_temp, pin, stove_thres = 40, cal_thres = 22)
       @name  = name
-      @stove_temp = stove_temp # ['value']
-
-      @cal_temp    = cal_temp # ['value']
+      @stove_temp = stove_temp 
+      @cal_temp    = cal_temp 
       @pin         = pin
       @cal_thres   = cal_thres
       @stove_thres = stove_thres
