@@ -14,7 +14,7 @@ config['sensors']['temp'].each do |k, v|
   @temp_sensor_data <<  sensors.temperature(k, v['address'])
 end
 config['sensors']['current'].each do |k, v|
-  @current_sensor_data  <<  sensors.current(k, v['address'], model = v['model'], mode = v['mode'])
+  @current_sensor_data  <<  sensors.current(k, v['address'], model = v['model'], type = v['type'])
 end
 
 @misc_sensor_data = [
