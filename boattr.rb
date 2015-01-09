@@ -288,12 +288,18 @@ module Boattr
     end
   end
   class Config
+    attr_reader :sensors, :read
     def self.read(config_file = 'config.yml')
       parsed = begin
                  YAML.load(File.open(config_file))
                rescue ArgumentError => e
                  puts "Could not parse config file: #{e.message}"
                end
+    end
+    def self.sensors(config = self.read)
+      @sensor_data = []
+      config['sensors'].each() { |k,v| v.each() { |x| @sensor_data << x[1].merge!({'type' => k, 'name' => x[0] }) }}
+      return  @sensor_data
     end
   end
   class Control
