@@ -116,7 +116,9 @@ module Boattr
     def to_db(sensor_data)
       @data  = sensor_data
       @data.each do |x|
-        next if x.nil?
+        if x.nil?
+          next
+        end
         p x
         @doc = { '_id' => now }.merge x
         @sensorsdb.save_doc(@doc)
@@ -143,9 +145,42 @@ module Boattr
         @sensorsdb.save_doc(doc)
       rescue
         @sensorsdb.save_doc(
-                            '_id' => "_design/#{@type}",
-                            :language => 'javascript',
-                            :views    =>  @views
+          '_id' => "_design/#{@type}",
+          :language => 'javascript',
+          :views    =>  @views
+        )
+      end
+    end
+    def views(sensor_data)
+      @data  = sensor_data
+      @data.each do |x|
+        if x.nil? || x['type'] != 'current'
+          next
+        end
+        @name  = x['name']
+        @type  = x['type']
+        @mode  = x['mode']
+        @sensorsdb.save_doc(
+
+                              '_id' => "_design/#{@type}",
+                              :views => {
+                                "#{@name}".to_sym => {
+                                  map: "function(doc) {  if (doc.name == \"#{@name}\") {  emit(doc._id, doc.value);  }}"
+                                },
+                                'ampMinutes'.to_sym => {
+                                  map: "function(doc) {  if (doc.type == \"#{@type}\") {  emit(doc.name, doc.value);  }}",
+                                  reduce: "function(keys, values, rereduce) {\n  var length = values.length\n  return sum(values)/length\n}"
+                                },
+                                'ampMinutesLoad'.to_sym => {
+                                  map: "function(doc) {  if (doc.type == \"#{@type}\" && doc.mode == \"load\") {  emit(doc.name, doc.value);  }}",
+                                  reduce: "function(keys, values, rereduce) {\n  var length = values.length\n  return sum(values)/length\n}"
+                                },
+                                'ampMinutesSrc'.to_sym => {
+                                  map: "function(doc) {  if (doc.type == \"#{@type}\" && doc.mode == \"src\") {  emit(doc.name, doc.value);  }}",
+                                  reduce: "function(keys, values, rereduce) {\n  var length = values.length\n  return sum(values)/length\n}"
+                                }
+
+                              }
                             )
       end
     end
@@ -156,7 +191,9 @@ module Boattr
       @from = Time.now.to_i - @hours * 60 * 60
       @merged = []
       @data.each do |x|
-        next if x.nil? || x['type'] != 'current'
+        if x.nil? || x['type'] != 'current'
+          next
+        end
         @name   = x['name']
         @type   = x['type']
         @mode   = x['mode']
@@ -264,18 +301,12 @@ module Boattr
     end
   end
   class Config
-    attr_reader :sensors, :read
     def self.read(config_file = 'config.yml')
       parsed = begin
                  YAML.load(File.open(config_file))
                rescue ArgumentError => e
                  puts "Could not parse config file: #{e.message}"
                end
-    end
-    def self.sensors(config = self.read)
-      @sensor_data = []
-      config['sensors'].each() { |k,v| v.each() { |x| @sensor_data << x[1].merge!({'type' => k, 'name' => x[0] }) }}
-      return  @sensor_data
     end
   end
   class Control
