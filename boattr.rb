@@ -110,12 +110,13 @@ module Boattr
       end
     end
 
-    def create_views(sensor_data)
+
+def create_views(sensor_data,type)
       # at this point this only creates  views of the same type, in one design doc.
       @data       = sensor_data
       @views      = {}
       @data.each do |x|
-        next if x.nil?
+        next if x.nil? || x['type'] != type
         @name  = x['name']
         @type  = x['type']
         @view  = { "#{@name}".to_sym => {
@@ -124,46 +125,16 @@ module Boattr
         }
         @views.merge!(@view)
       end
-      p @views
-      @sensorsdb.save_doc(
-
-                              '_id' => "_design/#{@type}",
-                              :language => 'javascript',
-                              :views    =>  @views
-                            )
-    end
-
-    def views(sensor_data)
-      @data  = sensor_data
-      @data.each do |x|
-        if x.nil? || x['type'] != 'current'
-          next
-        end
-        @name  = x['name']
-        @type  = x['type']
-        @mode  = x['mode']
+      begin
+        doc = @sensorsdb.get("_design/#{type}")
+        doc['views'] = @views
+        @sensorsdb.save_doc(doc)
+      rescue
         @sensorsdb.save_doc(
-
-                              '_id' => "_design/#{@type}",
-                              :views => {
-                                "#{@name}".to_sym => {
-                                  map: "function(doc) {  if (doc.name == \"#{@name}\") {  emit(doc._id, doc.value);  }}"
-                                },
-                                'ampMinutes'.to_sym => {
-                                  map: "function(doc) {  if (doc.type == \"#{@type}\") {  emit(doc.name, doc.value);  }}",
-                                  reduce: "function(keys, values, rereduce) {\n  var length = values.length\n  return sum(values)/length\n}"
-                                },
-                                'ampMinutesLoad'.to_sym => {
-                                  map: "function(doc) {  if (doc.type == \"#{@type}\" && doc.mode == \"load\") {  emit(doc.name, doc.value);  }}",
-                                  reduce: "function(keys, values, rereduce) {\n  var length = values.length\n  return sum(values)/length\n}"
-                                },
-                                'ampMinutesSrc'.to_sym => {
-                                  map: "function(doc) {  if (doc.type == \"#{@type}\" && doc.mode == \"src\") {  emit(doc.name, doc.value);  }}",
-                                  reduce: "function(keys, values, rereduce) {\n  var length = values.length\n  return sum(values)/length\n}"
-                                }
-
-                              }
-                            )
+          '_id' => "_design/#{@type}",
+          :language => 'javascript',
+          :views    =>  @views
+        )
       end
     end
 
@@ -189,7 +160,6 @@ module Boattr
       end
       @merged
     end
-
     def amphour_balance(amphours_data)
       @loads, @sources = 0, 0
       @amphours       = amphours_data
