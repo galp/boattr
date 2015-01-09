@@ -13,56 +13,49 @@ require 'nokogiri'
 
 module Boattr
   class Sensors
-    @@data = []
-    @@device
-    @@OWdevices = []
-    attr_reader :location, :i2cAddress, :i2cBus, :data, :basename
+    attr_reader :i2c_adc_address, :i2c_device, :data, :basename, :onewire_devices
     def initialize(params)
-      @@basename    = params['boattr']['basename']
-      @i2cAdcAddress   = params['boattr']['i2cAdcAddress']
-      @@device      = ::I2C.create(params['boattr']['i2cBus'])
-      readI2cADC(@i2cAdcAddress)
-      onewire
+      @basename        = params['boattr']['basename']
+      @i2c_adc_address = params['boattr']['i2cAdcAddress']
+      @i2c_device      = ::I2C.create(params['boattr']['i2cBus'])
+      read_i2c_adc(@i2c_adc_address)
+      read_onewire_bus
     end
 
-    def readI2cADC(address)
-      @address = address
-      @iterate = 16
-      @data    = Array.new(10) { Array.new }
-      @samples = []
+    def read_i2c_adc(address)
+      @address  = address
+      @iterate  = 16
+      @data_set = Array.new(10) { Array.new }
+      @adc_samples = []
+      @data        = []
       @iterate.times do # we take @iterate samples
         # read 20 bytes from slave, convert to decimals, and finaly in 10bit values.
-        @adc = @@device.read(@address, 0x14, 0x00).unpack('C*').map { |e| e.to_s 10 }
+        @adc = i2c_device.read(@address, 0x14, 0x00).unpack('C*').map { |e| e.to_s 10 }
         sleep(0.1)
         # slice the 20 byte array into pairs (MSB,LSB) and convert decimal.
-        @adc.each_slice(2) { |a| @samples << a[0].to_i * 256 + a[1].to_i }
-        # p @samples
-        @data.each_with_index { |d, i| d << @samples[i] }
-        @samples = []
+        @adc.each_slice(2) { |a| @adc_samples << a[0].to_i * 256 + a[1].to_i }
+        @data_set.each_with_index { |d, i| d << @adc_samples[i] }
+        @adc_samples = []
       end
       # take the average (array.inject(:+) ? )
-      @data.each_with_index do |d, _i|
+      @data_set.each_with_index do |d, _i|
         # sort and remove max and min
         d = d.sort
-        d.pop
-        d.pop
-        d.shift
-        d.shift
-        @@data << d.inject { |sum, x| sum + x } / (@iterate - 4)
+        d.pop(2)
+        d.shift(2)
+        @data << d.inject { |sum, x| sum + x } / (@iterate - 4)
       end
-      @@data
     end
 
-    def onewire
+    def read_onewire_bus
       @basedir  = '/sys/bus/w1/devices/'
       Dir.chdir(@basedir)
-      @@OWdevices = Dir['*-*']
-      @@OWdevices
+      @onewire_devices = Dir['*-*']
     end
 
     def voltage(name, address)
       @name    = name
-      @raw     = @@data[address]
+      @raw     = data[address]
       @volts = @raw * 0.015357
       { 'name' => @name, 'type' => 'volts', 'raw' => @raw, 'value' => @volts.round(2) }
     end
@@ -72,14 +65,10 @@ module Boattr
       @name    = name
       @mode    = mode
       @divider = @supported_models[model]
-      @raw     = @@data[address]
+      @raw     = data[address]
       @volts   = (@raw * 0.004887)
-      if mode == 'src' && @volts < 2.5 # a source should not show negative values.
-        @volts = 2.5
-      end
-      if mode == 'load' && @volts > 2.5 # a load should not show possitive values
-        @volts = 2.5
-      end
+      # a load should only be negative and  a source should be possitive
+      @volts   = 2.5 if @mode == 'src' && @volts < 2.5 || @mode == 'load' && @volts > 2.5
       @amps    = (@volts - 2.5) / @divider
       { 'name' => @name, 'type' => 'current', 'mode' => @mode, 'raw' => @raw, 'value' => @amps.round(2) }
     end
@@ -88,49 +77,45 @@ module Boattr
       @name     = name
       @address  = address
       @basedir  = '/sys/bus/w1/devices/'
-      if @@OWdevices.include?(@address)
-        file = File.open("#{@basedir}/#{address}/w1_slave", 'r')
-        if file.readline.include?('YES') ## Is CRC valid in the first line? lets read the second and extract the temp
-          @temp = file.readline.split[-1].split('=')[-1].to_i / 1000.0
-          return { 'name' => @name, 'type' => 'temp', 'address' => @address,  'value' => @temp.round(2) }
-        end
-      end
+      return unless onewire_devices.include?(@address)
+      @file = File.open("#{@basedir}/#{address}/w1_slave", 'r')
+      return unless @file.readline.include?('YES') # Is CRC valid in the first line?
+      @temp = @file.readline.split[-1].split('=')[-1].to_i / 1000.0
+      { 'name' => @name, 'type' => 'temp', 'address' => @address,  'value' => @temp.round(2) }
     end
   end
 
   class Data
-    attr_reader :sensorsdb
+    attr_reader :basename
     def initialize(params)
       @graphite    = params['graphite']['host']
       @couchdb     = params['couchdb']['host']
-      @@basename   = params['boattr']['basename']
+      @basename    = params['boattr']['basename']
       unless @graphite.nil? || @graphite.empty?
         @g         = Graphite.new(host: "#{@graphite}", port: 2003)
       end
       unless @couchdb.nil? || @couchdb.empty?
-        @sensorsdb = CouchRest.database!("http://#{@couchdb}:5984/#{@@basename}-sensors")
-        @statsdb   = CouchRest.database!("http://#{@couchdb}:5984/#{@@basename}-stats")
+        @sensorsdb = CouchRest.database!("http://#{@couchdb}:5984/#{@basename}-sensors")
+        @statsdb   = CouchRest.database!("http://#{@couchdb}:5984/#{@basename}-stats")
       end
     end
 
     def to_db(sensor_data)
       @data  = sensor_data
       @data.each do |x|
-        if x.nil?
-          next
-        end
+        next if x.nil?
         p x
         @doc = { '_id' => now }.merge x
         @sensorsdb.save_doc(@doc)
       end
     end
 
-    def create_views(sensor_data,type)
+    def create_views(sensor_data)
       # at this point this only creates  views of the same type, in one design doc.
       @data       = sensor_data
       @views      = {}
       @data.each do |x|
-        next if x.nil? || x['type'] != type
+        next if x.nil?
         @name  = x['name']
         @type  = x['type']
         @view  = { "#{@name}".to_sym => {
@@ -139,18 +124,15 @@ module Boattr
         }
         @views.merge!(@view)
       end
-      begin
-        doc = @sensorsdb.get("_design/#{type}")
-        doc['views'] = @views
-        @sensorsdb.save_doc(doc)
-      rescue
-        @sensorsdb.save_doc(
-          '_id' => "_design/#{@type}",
-          :language => 'javascript',
-          :views    =>  @views
-        )
-      end
+      p @views
+      @sensorsdb.save_doc(
+
+                              '_id' => "_design/#{@type}",
+                              :language => 'javascript',
+                              :views    =>  @views
+                            )
     end
+
     def views(sensor_data)
       @data  = sensor_data
       @data.each do |x|
@@ -208,7 +190,7 @@ module Boattr
       @merged
     end
 
-    def amphourBalance(amphours_data)
+    def amphour_balance(amphours_data)
       @loads, @sources = 0, 0
       @amphours       = amphours_data
       @amphours.each do |x|
@@ -219,22 +201,21 @@ module Boattr
           @loads += x['value']
         end
       end
-      [{ 'name' => 'sources', 'type' => 'amphours', 'hours' => @hours, 'value' => @sources.round(2) }, { 'name' => 'loads', 'type' => 'amphours', 'hours' => @hours, 'value' => @loads.round(2) }]
+      [{ 'name' => 'sources', 'type' => 'amphours', 'hours' => @hours, 'value' => @sources.round(2) },
+       { 'name' => 'loads', 'type' => 'amphours', 'hours' => @hours, 'value' => @loads.round(2) }]
     end
 
     def to_graphite(sensor_data)
-      @base  = @@basename
-      @data  = sensor_data
-      # p "#{@base}.#{@type}.#{@name} #{@value} #{@g.time_now}"
+      @basename  = basename
+      p @basename
+      @data      = sensor_data
       @data.each do |x|
-        if x.nil?
-          next
-        end
+        next if x.nil?
         @type  = x['type']
         @name  = x['name']
         @value = x['value']
         @g.push_to_graphite do |graphite|
-          graphite.puts "#{@base}.#{@type}.#{@name} #{@value} #{@g.time_now}"
+          graphite.puts "#{@basename}.#{@type}.#{@name} #{@value} #{@g.time_now}"
         end
       end
     end
@@ -263,22 +244,26 @@ module Boattr
     end
   end
   class Dashing
+    attr_reader :host
     def initialize(params)
-      @dashboard   = params['dashing']['host']
-      @dash_auth   = params['dashing']['auth']
+      @host      = params['dashing']['host']
+      @dash_auth = params['dashing']['auth']
     end
 
     def to_dashboard(sensor_data)
       @data = sensor_data
       @data.each do |x|
-        if x.nil?
-          next
-        end
+        next if x.nil?
         @type  = x['type']
         @name  = x['name']
         @value = x['value']
-        HTTParty.post("http://#{@dashboard}:3030/widgets/#{@type}#{@name}",
-                      body: { auth_token: "#{@dash_auth}", current: @value, moreinfo: @type, title: @name }.to_json)
+        HTTParty.post("http://#{@host}:3030/widgets/#{@type}#{@name}",
+                      body: {
+                        auth_token: "#{@dash_auth}",
+                        current: @value,
+                        moreinfo: @type,
+                        title: @name }.to_json
+                      )
       end
     end
 
@@ -287,17 +272,19 @@ module Boattr
       @widget = widget
       @items  = []
       @data.each do |x|
-        if x.nil?
-          next
-        end
+        next if x.nil?
         @name  = x['name']
         @value = x['value']
         @hours = x['hours']
-        @type  = x['type']
         @items << { label: @name, value: @value }
       end
-      HTTParty.post("http://#{@dashboard}:3030/widgets/#{@widget}",
-                    body: { auth_token: "#{@dash_auth}", items: @items, moreinfo: "last #{@hours} hours", title: @widget }.to_json)
+      HTTParty.post("http://#{@host}:3030/widgets/#{@widget}",
+                    body: {
+                      auth_token: "#{@dash_auth}",
+                      items: @items,
+                      moreinfo: "last #{@hours} hours",
+                      title: @widget }.to_json
+                    )
     end
   end
   class Config
@@ -312,25 +299,19 @@ module Boattr
   class Control
     def pump(name, stove_temp, cal_temp, pin, stove_thres = 40, cal_thres = 22)
       @name  = name
-      @stove_temp = stove_temp # ['value']
-
-      @cal_temp    = cal_temp # ['value']
+      @stove_temp = stove_temp
+      @cal_temp    = cal_temp
       @pin         = pin
       @cal_thres   = cal_thres
       @stove_thres = stove_thres
-      @pump = ::GPIO::OutputPin.new(device: :BeagleboneBlack, pin: @pin)
+      @pump = ::GPIO::Relay.new(device: :BeagleboneBlack, pin: @pin)
       if @cal_temp.nil? || @stove_temp.nil? ||  @stove_temp < @stove_thres || @cal_temp > @cal_thres
         puts "#{@name} off,  stove :#{@stove_temp}, cal : #{@cal_temp}"
-        @pump.on # confusing as relays LOW is OFF
+        @pump.off 
       else
         p "#{@name} on,  stove :#{@stove_temp}, cal : #{@cal_temp}"
-        @pump.off # confusing as relays LOW is ON
+        @pump.on 
       end
-    end
-  end
-  class Camera
-    def camera(_device)
-      # take a snapshot, upload to db
     end
   end
 end
