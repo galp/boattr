@@ -1,29 +1,38 @@
 require '/root/boattr/boattr.rb'
 hostname = Socket.gethostname
 p hostname
-config         = Boattr::Config.read
-active_sensors = Boattr::Config.sensors
+config         = Boattr::Config.read('/root/boattr/config.yml')
+active_sensors = Boattr::Config.sensors(config)
 sensors        = Boattr::Sensors.new(config)
 allowance      = Boattr::Data.new(config)
 
 @current_sensor_data = []
 @temp_sensor_data    = []
 @sensor_data         = []
+@voltage_sensor_data = []
 
-active_sensors['temp'].each do |k, v|
-  @temp_sensor_data <<  sensors.temperature(k, v['address'])
-end
-active_sensors['current'].each do |k, v|
-  @current_sensor_data  <<  sensors.current(k, v['address'], model = v['model'], mode = v['mode'])
+active_sensors.each do |v|
+  next unless v['type'] == 'temp'
+  @temp_sensor_data <<  sensors.temperature(v['name'], v['address'])
 end
 
+active_sensors.each do |v|
+  next unless v['type'] == 'current'
+  @current_sensor_data  <<  sensors.current(v['name'], v['address'], model = v['model'], mode = v['mode'])
+end
+
+active_sensors.each do |v|
+  next unless v['type'] == 'voltage'
+  @voltage_sensor_data  <<  sensors.voltage(v['name'],v['address'])
+end
+               
 @misc_sensor_data = [
-  sensors.voltage('batteries', 6),
   allowance.get_remaining_data('ee')
 ]
 
 @sensor_data.concat(@current_sensor_data)
 @sensor_data.concat(@temp_sensor_data)
+@sensor_data.concat(@voltage_sensor_data)
 @sensor_data.concat(@misc_sensor_data)
 
 Boattr::Data.new(config).to_db(@sensor_data)
@@ -36,4 +45,4 @@ dash.to_dashboard(@sensor_data)
 
 @stove_temp = @temp_sensor_data[3]['value']
 @cylinder_temp = @temp_sensor_data[2]['value']
-Boattr::Control.new.pump('calorifier pump', @stove_temp, @cylinder_temp, 30, 40, 22)
+Boattr::Control.new.pump('calorifier pump', @stove_temp, @cylinder_temp, 30, 40, 23)
