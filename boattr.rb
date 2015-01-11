@@ -268,7 +268,12 @@ def create_views(sensor_data,type)
     end
     def self.sensors(config = self.read)
       @sensor_data = []
-      config['sensors'].each() { |k,v| v.each() { |x| @sensor_data << x[1].merge!({'type' => k, 'name' => x[0] }) }}
+      config['sensors'].each() do |k,v| 
+        v.each() do |x| 
+          next if x[1]['disabled']?
+          @sensor_data <<  x[1].merge!({'type' => k, 'name' => x[0] })
+        end
+      end
       return  @sensor_data
     end
   end

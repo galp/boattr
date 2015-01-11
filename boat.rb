@@ -1,19 +1,19 @@
 require '/root/boattr/boattr.rb'
 hostname = Socket.gethostname
 p hostname
-config = Boattr::Config.read('/root/boattr/config.yml')
-
-sensors = Boattr::Sensors.new(config)
-allowance = Boattr::Data.new(config)
+config         = Boattr::Config.read
+active_sensors = Boattr::Config.sensors
+sensors        = Boattr::Sensors.new(config)
+allowance      = Boattr::Data.new(config)
 
 @current_sensor_data = []
 @temp_sensor_data    = []
 @sensor_data         = []
 
-config['sensors']['temp'].each do |k, v|
+active_sensors['temp'].each do |k, v|
   @temp_sensor_data <<  sensors.temperature(k, v['address'])
 end
-config['sensors']['current'].each do |k, v|
+active_sensors['current'].each do |k, v|
   @current_sensor_data  <<  sensors.current(k, v['address'], model = v['model'], type = v['type'])
 end
 
