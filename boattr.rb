@@ -30,7 +30,12 @@ module Boattr
       @data        = []
       @iterate.times do # we take @iterate samples
         # read 20 bytes from slave, convert to decimals, and finaly in 10bit values.
-        @adc = i2c_device.read(@address, 0x14, 0x00).unpack('C*').map { |e| e.to_s 10 }
+        begin
+          @adc = i2c_device.read(@address, 0x14, 0x00).unpack('C*').map { |e| e.to_s 10 }
+        rescue
+          puts "i2c device at address #{@address} not responding"
+          return
+        end
         sleep(0.1)
         # slice the 20 byte array into pairs (MSB,LSB) and convert decimal.
         @adc.each_slice(2) { |a| @adc_samples << a[0].to_i * 256 + a[1].to_i }
@@ -54,6 +59,7 @@ module Boattr
     end
 
     def voltage(name, address)
+      return if data.empty?
       @name    = name
       @raw     = data[address]
       @volts = @raw * 0.015357
@@ -61,6 +67,7 @@ module Boattr
     end
 
     def current(name, address, model = 'acs714', mode = 'both')
+      return if data.empty?
       @supported_models = { 'acs714' => 0.066, 'acs709' => 0.028, 'acs712' => 0.185 }
       @name    = name
       @mode    = mode
