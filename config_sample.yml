@@ -1,0 +1,62 @@
+boattr:
+   basename: boat
+   description: "analog/i2c from brain01"
+   i2cBus: /dev/i2c-1
+   i2cAdc: 
+     adc1: 
+       address: 0x28
+     adc2: 
+       address: 0x21 
+       discription: "foo bar"
+       disabled: true
+couchdb:
+   host: 192.168.8.1   
+dashing:
+   host: localhost
+   auth: YOUR_AUTH_TOKEN
+graphite:
+   host: 10.70.60.1
+sensors:
+   temp:
+     in:
+       address: 10-0008029674ee
+       description: "inside temperature"
+     out:
+       address: 10-000802964c0d
+     cylinder:
+       address: 10-000802961f0d
+     stove:
+       address: 10-00080296978d
+     bed:
+       address: 28-00000566f3b8     
+   current:
+     solar:
+       address:  0
+       model:  acs714
+       mode:  src
+     genny:
+       address:  1
+       model:  acs709
+       mode:  src
+     lights:
+       address:  2
+       model:  acs714
+       mode:  load
+     pumps:
+       address:  3
+       model:  acs714
+       mode:  load
+       disabled: true
+     ring:
+       address:  4
+       model:  acs714
+       mode:  load
+     fridge:
+       address:  5
+       model:  acs714
+       mode:  load
+   voltage:
+     batteries:
+       address: 6
+
+     

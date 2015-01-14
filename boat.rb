@@ -2,7 +2,7 @@ require '/root/boattr/boattr.rb'
 hostname = Socket.gethostname
 p hostname
 config         = Boattr::Config.read('/root/boattr/config.yml')
-active_sensors = Boattr::Config.sensors(config)
+enabled_sensors = Boattr::Config.enabled_sensors(config)
 sensors        = Boattr::Sensors.new(config)
 allowance      = Boattr::Data.new(config)
 
@@ -11,17 +11,17 @@ allowance      = Boattr::Data.new(config)
 @sensor_data         = []
 @voltage_sensor_data = []
 
-active_sensors.each do |v|
+enabled_sensors.each do |v|
   next unless v['type'] == 'temp'
   @temp_sensor_data <<  sensors.temperature(v['name'], v['address'])
 end
 
-active_sensors.each do |v|
+enabled_sensors.each do |v|
   next unless v['type'] == 'current'
   @current_sensor_data  <<  sensors.current(v['name'], v['address'], model = v['model'], mode = v['mode'])
 end
 
-active_sensors.each do |v|
+enabled_sensors.each do |v|
   next unless v['type'] == 'voltage'
   @voltage_sensor_data  <<  sensors.voltage(v['name'],v['address'])
 end

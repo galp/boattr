@@ -1,6 +1,6 @@
 require '/root/boattr/boattr.rb'
 config = Boattr::Config.read('/root/boattr/config.yml')
-active_sensors = Boattr::Config.sensors(config)
+enabled_sensors = Boattr::Config.enabled_sensors(config)
 
 
 
@@ -8,7 +8,7 @@ active_sensors = Boattr::Config.sensors(config)
 @hours = 24
 a = Boattr::Data.new(config)
 
-@boat_amphours = a.amphours(active_sensors, @hours)
+@boat_amphours = a.amphours(enabled_sensors, @hours)
 @balance       = a.amphour_balance(@boat_amphours)
 @balance.concat(@boat_amphours)
 

@@ -16,40 +16,46 @@ module Boattr
     attr_reader :i2c_adc_address, :i2c_device, :data, :basename, :onewire_devices
     def initialize(params)
       @basename        = params['boattr']['basename']
-      @i2c_adc_address = params['boattr']['i2cAdcAddress']
+      @i2c_adc         = params['boattr']['i2cAdc']
       @i2c_device      = ::I2C.create(params['boattr']['i2cBus'])
-      read_i2c_adc(@i2c_adc_address)
+      read_i2c_adc(@i2c_adc)
       read_onewire_bus
     end
 
     def read_i2c_adc(address)
-      @address  = address
+      @data     = {}
       @iterate  = 16
-      @data_set = Array.new(10) { Array.new }
-      @adc_samples = []
-      @data        = []
-      @iterate.times do # we take @iterate samples
-        # read 20 bytes from slave, convert to decimals, and finaly in 10bit values.
-        begin
-          @adc = i2c_device.read(@address, 0x14, 0x00).unpack('C*').map { |e| e.to_s 10 }
-        rescue
-          puts "i2c device at address #{@address} not responding"
-          return
-        end
-        sleep(0.1)
-        # slice the 20 byte array into pairs (MSB,LSB) and convert decimal.
-        @adc.each_slice(2) { |a| @adc_samples << a[0].to_i * 256 + a[1].to_i }
-        @data_set.each_with_index { |d, i| d << @adc_samples[i] }
+      p address
+      address.each do |k,v|
+        next if v['disabled'] 
+        d            = []
+        @data_set    = Array.new(10) { Array.new }
         @adc_samples = []
+        @iterate.times do # we take @iterate samples
+          # read 20 bytes from slave, convert to decimals, and finaly in 10bit values.
+          begin
+            @adc = i2c_device.read(v['address'], 0x14, 0x00).unpack('C*').map { |e| e.to_s 10 }
+          rescue
+            puts "i2c device #{k} at address #{v['address']} not responding"
+            return
+          end
+          sleep(0.1)
+          # slice the 20 byte array into pairs (MSB,LSB) and convert decimal.
+          @adc.each_slice(2) { |a| @adc_samples << a[0].to_i * 256 + a[1].to_i }
+          @data_set.each_with_index { |d, i| d << @adc_samples[i] }
+          @adc_samples = []
+        end
+        # take the average (array.inject(:+) ? )
+        @data_set.each_with_index do |d, _i|
+          # sort and remove max and min
+          d = d.sort
+          d.pop(2)
+          d.shift(2)
+          d << d.inject { |sum, x| sum + x } / (@iterate - 4)
+          @data[k] = d
+        end
       end
-      # take the average (array.inject(:+) ? )
-      @data_set.each_with_index do |d, _i|
-        # sort and remove max and min
-        d = d.sort
-        d.pop(2)
-        d.shift(2)
-        @data << d.inject { |sum, x| sum + x } / (@iterate - 4)
-      end
+      p @data
     end
 
     def read_onewire_bus
@@ -58,10 +64,18 @@ module Boattr
       @onewire_devices = Dir['*-*']
     end
 
+    def pressure(name, address)
+      return if data.empty?
+      @name    = name
+      @raw     = data[address['adc']][address['pin']]
+      @volts = @raw * 0.015357
+      { 'name' => @name, 'type' => 'pressure', 'raw' => @raw, 'value' => @volts.round(2) }
+    end
+
     def voltage(name, address)
       return if data.empty?
       @name    = name
-      @raw     = data[address]
+      @raw     = data[address['adc']][address['pin']]
       @volts = @raw * 0.015357
       { 'name' => @name, 'type' => 'volts', 'raw' => @raw, 'value' => @volts.round(2) }
     end
@@ -72,7 +86,7 @@ module Boattr
       @name    = name
       @mode    = mode
       @divider = @supported_models[model]
-      @raw     = data[address]
+      @raw     = data[address['adc']][address['pin']]
       @volts   = (@raw * 0.004887)
       # a load should only be negative and  a source should be possitive
       @volts   = 2.5 if @mode == 'src' && @volts < 2.5 || @mode == 'load' && @volts > 2.5
@@ -265,7 +279,7 @@ def create_views(sensor_data,type)
     end
   end
   class Config
-    attr_reader :sensors, :read
+    attr_reader :enabled_sensors, :read
     def self.read(config_file = 'config.yml')
       parsed = begin
                  YAML.load(File.open(config_file))
@@ -273,15 +287,15 @@ def create_views(sensor_data,type)
                  puts "Could not parse config file: #{e.message}"
                end
     end
-    def self.sensors(config = self.read)
-      @sensor_data = []
+    def self.enabled_sensors(config = self.read)
+      @data = []
       config['sensors'].each() do |k,v| 
         v.each() do |x| 
           next if x[1]['disabled']
-          @sensor_data <<  x[1].merge!({'type' => k, 'name' => x[0] })
+          @data <<  x[1].merge!({'type' => k, 'name' => x[0] })
         end
       end
-      return  @sensor_data
+      return @data
     end
   end
   class Control
