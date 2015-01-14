@@ -30,28 +30,40 @@ sensors:
        address: 28-00000566f3b8
    current:
      solar:
-       address:  0
+       address:
+         adc: adc0
+         pin: 2
        model:  acs714
        mode:  src
      genny:
-       address:  1
+       address:
+         adc: adc0
+         pin: 1
        model:  acs709
        mode:  src
      lights:
-       address:  2
+       address:
+         adc: adc0
+         pin: 2
        model:  acs714
        mode:  load
      pumps:
-       address:  3
+       address:
+         adc: adc0
+         pin: 3
        model:  acs714
        mode:  load
        disabled: true
      ring:
-       address:  4
+       address:
+         adc: adc0
+         pin: 4
        model:  acs714
        mode:  load
      fridge:
-       address:  5
+       address:
+         adc: adc0
+         pin: 5
        model:  acs714
        mode:  load
    voltage:
