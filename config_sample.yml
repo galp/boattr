@@ -1,16 +1,15 @@
 boattr:
    basename: boat
-   description: "analog/i2c from brain01"
+   description: "boattr dev box"
    i2cBus: /dev/i2c-1
-   i2cAdc: 
-     adc1: 
-       address: 0x28
-     adc2: 
-       address: 0x21 
-       discription: "foo bar"
+   i2cAdc:
+     adc0:
+       address: 0x2c
+     adc1:
+       address: 0x2f
        disabled: true
 couchdb:
-   host: 192.168.8.1   
+   host: localhost
 dashing:
    host: localhost
    auth: YOUR_AUTH_TOKEN
@@ -28,7 +27,7 @@ sensors:
      stove:
        address: 10-00080296978d
      bed:
-       address: 28-00000566f3b8     
+       address: 28-00000566f3b8
    current:
      solar:
        address:  0
@@ -57,6 +56,11 @@ sensors:
        mode:  load
    voltage:
      batteries:
-       address: 6
-
-     
+       address:
+         adc: adc1
+         pin: 6
+   pressure:
+     watertank:
+       address:
+         adc: adc0
+         pin: 1
