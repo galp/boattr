@@ -25,10 +25,9 @@ module Boattr
     def read_i2c_adc(address)
       @data     = {}
       @iterate  = 16
-      p address
       address.each do |k,v|
         next if v['disabled'] 
-        d            = []
+        @adc_data    = []
         @data_set    = Array.new(10) { Array.new }
         @adc_samples = []
         @iterate.times do # we take @iterate samples
@@ -51,8 +50,8 @@ module Boattr
           d = d.sort
           d.pop(2)
           d.shift(2)
-          d << d.inject { |sum, x| sum + x } / (@iterate - 4)
-          @data[k] = d
+          @adc_data << d.inject { |sum, x| sum + x } / (@iterate - 4)
+          @data[k] = @adc_data
         end
       end
       p @data
