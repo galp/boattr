@@ -134,7 +134,7 @@ module Boattr
     end
 
 
-def create_views(sensor_data,type)
+    def create_views(sensor_data,type)
       # at this point this only creates  views of the same type, in one design doc.
       @data       = sensor_data
       @views      = {}
@@ -167,9 +167,7 @@ def create_views(sensor_data,type)
       @from = Time.now.to_i - @hours * 60 * 60
       @merged = []
       @data.each do |x|
-        if x.nil? || x['type'] != 'current'
-          next
-        end
+        next if x.nil? || x['type'] != 'current'
         @name   = x['name']
         @type   = x['type']
         @mode   = x['mode']
@@ -282,7 +280,7 @@ def create_views(sensor_data,type)
   end
   class Config
     attr_reader :enabled_sensors, :read
-    def self.read(config_file = 'config.yml')
+    def self.read(config_file = './config.yml')
       parsed = begin
                  YAML.load(File.open(config_file))
                rescue ArgumentError => e

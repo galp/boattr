@@ -1,5 +1,6 @@
-require '/root/boattr/boattr.rb'
-config = Boattr::Config.read('/root/boattr/config.yml')
+require File.dirname(__FILE__)+'/'+'boattr.rb'
+
+config = Boattr::Config.read(File.dirname(__FILE__)+'/config.yml')
 enabled_sensors = Boattr::Config.enabled_sensors(config)
 
 

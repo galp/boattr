@@ -1,7 +1,7 @@
-require '/root/boattr/boattr.rb'
+require File.dirname(__FILE__)+'/'+'boattr.rb'
 hostname = Socket.gethostname
 p hostname
-config         = Boattr::Config.read('/root/boattr/config.yml')
+config         = Boattr::Config.read(File.dirname(__FILE__)+'/'+'config.yml')
 enabled_sensors = Boattr::Config.enabled_sensors(config)
 sensors        = Boattr::Sensors.new(config)
 allowance      = Boattr::Data.new(config)
