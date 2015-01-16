@@ -198,7 +198,6 @@ module Boattr
 
     def to_graphite(sensor_data)
       @basename  = basename
-      p @basename
       @data      = sensor_data
       @data.each do |x|
         next if x.nil?
