@@ -16,8 +16,8 @@ module Boattr
     attr_reader :i2c_adc_address, :i2c_device, :data, :basename, :onewire_devices
     def initialize(params)
       @basename        = params['boattr']['basename']
-      @i2c_adc         = params['boattr']['i2cAdc']
-      @i2c_device      = ::I2C.create(params['boattr']['i2cBus'])
+      @i2c_adc         = params['i2c']['i2cAdc']
+      @i2c_device      = ::I2C.create(params['i2c']['i2cBus'])
       read_i2c_adc(@i2c_adc)
       read_onewire_bus
     end
@@ -71,7 +71,10 @@ module Boattr
       @volts = @raw * 0.015357
       { 'name' => @name, 'type' => 'pressure', 'raw' => @raw, 'value' => @volts.round(2) }
     end
-
+    def constrain(x,min,max)
+      x = min if x < min
+      x = max if x > max
+    end
     def voltage(name, address)
       return if data.empty?
       @name    = name

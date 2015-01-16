@@ -1,6 +1,7 @@
 boattr:
    basename: boat
    description: "boattr dev box"
+i2c:
    i2cBus: /dev/i2c-1
    i2cAdc:
      adc0:
