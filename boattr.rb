@@ -230,7 +230,7 @@ module Boattr
       else
         @bytes = @data.slice(0..-3).to_f / 1000.0
       end
-      { 'name' => @name, 'type' => 'data', 'value' => @bytes }
+      { 'name' => @name, 'type' => 'data', 'value' => @bytes.round(2) }
     end
   end
   class Dashing
@@ -298,21 +298,44 @@ module Boattr
     end
   end
   class Control
-    def pump(name, stove_temp, cal_temp, pin, stove_thres = 40, cal_thres = 22)
-      @name  = name
-      @stove_temp = stove_temp
-      @cal_temp    = cal_temp
-      @pin         = pin
-      @cal_thres   = cal_thres
-      @stove_thres = stove_thres
-      @pump = ::GPIO::Relay.new(device: :BeagleboneBlack, pin: @pin)
-      if @cal_temp.nil? || @stove_temp.nil? ||  @stove_temp < @stove_thres || @cal_temp > @cal_thres
-        puts "#{@name} off,  stove :#{@stove_temp}, cal : #{@cal_temp}"
-        @pump.off 
-      else
-        p "#{@name} on,  stove :#{@stove_temp}, cal : #{@cal_temp}"
-        @pump.on 
+    class Pump < Control
+      attr_reader :name, :pin
+      def initialize(name, pin)
+        @name = name
+        #@pin = ::GPIO::Relay.new(device: :BeagleboneBlack, pin: pin)
       end
+      def on
+        @pin.on
+        puts "#{name} on"
+      end
+      def off
+        @pin.off
+        puts "#{name} off"
+      end
+    end
+    def pump(name, params)
+      if @stove_temp > 40 &&  bed_temp > 20
+        puts "#{@name} on,  stove :#{@stove_temp}, cal : #{@cal_temp}"
+        @pump.on 
+      else
+        p "#{@name} off,  stove :#{@stove_temp}, cal : #{@cal_temp}"
+        @pump.off 
+      end
+
+  end
+    def stove_is_hot(stove_temp)
+      return unless stove_temp
+      if stove_temp > 40
+        #stove is hot
+        return true
+      else
+        return false
+      end
+    end
+    def temperature_index(temp_sensors)
+      sum = 0
+      temp_sensors.each {|x| sum +=x['value']}
+      avg = sum/temp_sensors.length
     end
   end
 end
