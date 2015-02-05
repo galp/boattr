@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+g#!/usr/bin/ruby
 require 'json'
 require 'time'
 require 'yaml'
@@ -17,3 +17,4 @@ require './lib/boattr/data/data.rb'
 require './lib/boattr/dashing/dashing.rb'
 require './lib/boattr/config/config.rb'
 require './lib/boattr/control/control.rb'
+require './lib/boattr/control/pump/pump.rb'
