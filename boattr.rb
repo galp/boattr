@@ -1,4 +1,4 @@
-g#!/usr/bin/ruby
+#!/usr/bin/ruby
 require 'json'
 require 'time'
 require 'yaml'
