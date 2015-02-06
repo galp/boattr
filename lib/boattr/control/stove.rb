@@ -1,24 +1,18 @@
 module Boattr
   class Control
     class Stove < Control
+      attr_reader :hot_threshold, :temp_sensors
       def initialize(temp_sensors)
-        @@temp_sensors = temp_sensors
-        @stove_hot_threshold = 40
+        @temp_sensors  = temp_sensors
+        @hot_threshold = 40
       end
-      def stove_is_hot
-        return unless @@temp_sensors['stove']
-        stove_temp = @@temp_sensors.select() { |x| x['name'] == 'stove'  }
-        if stove_temp > @stove_hot_threshold
-          #stove is hot
+      def is_hot
+        @stove_temp = Hash[*temp_sensors.select() { |x| x['name'] == 'stove'  }]
+        if @stove_temp['value'] > hot_threshold
           return true
         else
           return false
         end
-      end
-      def temperature_index
-        sum = 0
-        @@temp_sensors.each {|x| sum +=x['value'] }
-        avg = sum/@@temp_sensors.length
       end
     end
   end

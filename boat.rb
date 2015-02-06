@@ -1,4 +1,4 @@
-require File.dirname(__FILE__)+'/'+'boattr.rb'
+require File.dirname(__FILE__)+'/lib/'+'boattr.rb'
 hostname = Socket.gethostname
 p hostname
 config         = Boattr::Config.read(File.dirname(__FILE__)+'/'+'config.yml')
@@ -43,6 +43,19 @@ dash.list_to_dashboard(@current_sensor_data, 'amps')
 dash.list_to_dashboard(@temp_sensor_data, 'temps')
 dash.to_dashboard(@sensor_data)
 
-@stove_temp = @temp_sensor_data[3]['value']
-@cylinder_temp = @temp_sensor_data[2]['value']
-Boattr::Control.new.pump('calorifier pump', @stove_temp, @cylinder_temp, 30, 40, 23)
+
+pump  = Boattr::Control::Pump.new('calorifier pump', 30)
+stove = Boattr::Control::Stove.new(@temp_sensor_data)
+control = Boattr::Control.new
+temp_index = control.temp_index(@temp_sensor_data)
+
+
+p temp_index
+
+pump.on if temp_index > 19 
+pump.off if temp_index < 19   
+
+p stove.is_hot
+
+
+
