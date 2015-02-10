@@ -6,9 +6,7 @@ module Boattr
       @i2c_adc         = params['i2c']['i2cAdc']
       @i2c_device      = ::I2C.create(params['i2c']['i2cBus'])
       read_i2c_adc(@i2c_adc)
-      read_onewire_bus
     end
-
     def read_i2c_adc(address)
       @data     = {}
       @iterate  = 16
@@ -43,13 +41,6 @@ module Boattr
       end
       p @data
     end
-
-    def read_onewire_bus
-      @basedir  = '/sys/bus/w1/devices/'
-      Dir.chdir(@basedir)
-      @onewire_devices = Dir['*-*']
-    end
-
     def pressure(name, address)
       return if data.empty?
       @name    = name
@@ -81,17 +72,6 @@ module Boattr
       @volts   = 2.5 if @mode == 'src' && @volts < 2.5 || @mode == 'load' && @volts > 2.5
       @amps    = (@volts - 2.5) / @divider
       { 'name' => @name, 'type' => 'current', 'mode' => @mode, 'raw' => @raw, 'value' => @amps.round(2) }
-    end
-
-    def temperature(name, address)
-      @name     = name
-      @address  = address
-      @basedir  = '/sys/bus/w1/devices/'
-      return unless onewire_devices.include?(@address)
-      @file = File.open("#{@basedir}/#{address}/w1_slave", 'r')
-      return unless @file.readline.include?('YES') # Is CRC valid in the first line?
-      @temp = @file.readline.split[-1].split('=')[-1].to_i / 1000.0
-      { 'name' => @name, 'type' => 'temp', 'address' => @address,  'value' => @temp.round(2) }
     end
   end
 end
