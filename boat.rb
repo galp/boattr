@@ -50,12 +50,12 @@ control = Boattr::Control.new
 temp_index = control.temp_index(@temp_sensor_data)
 
 
-p temp_index
+puts "temp index : #{temp_index} stove hot : #{stove.is_hot}"
 
-pump.on if temp_index > 19 
+pump.on if temp_index > 19 && stove.is_hot
 pump.off if temp_index < 19   
+pump.off unless stove.is_hot
 
-p stove.is_hot
 
 
 
