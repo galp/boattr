@@ -7,8 +7,11 @@ module Boattr
         @hot_threshold = 40
       end
       def is_hot
-        @stove_temp = Hash[*temp_sensors.select() { |x| x['name'] == 'stove'  }]
-        if @stove_temp['value'] > hot_threshold
+        temp_sensors.each() do  |x|
+          next if x.nil?
+          @stove_temp = x['value'] if x['name'] == 'stove'
+        end
+        if @stove_temp > hot_threshold
           return true
         else
           return false
