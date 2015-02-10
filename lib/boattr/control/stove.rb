@@ -7,6 +7,7 @@ module Boattr
         @hot_threshold = 40
       end
       def is_hot
+        @stove_temp = nil
         temp_sensors.each() do  |x|
           next if x.nil?
           @stove_temp = x['value'] if x['name'] == 'stove'
