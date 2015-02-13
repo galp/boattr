@@ -13,6 +13,8 @@ require 'nokogiri'
 
 
 require File.dirname(__FILE__)+'/boattr/sensors/sensors.rb'
+require File.dirname(__FILE__)+'/boattr/sensors/temp.rb'
+require File.dirname(__FILE__)+'/boattr/sensors/voltage.rb'
 require File.dirname(__FILE__)+'/boattr/data/data.rb'
 require File.dirname(__FILE__)+'/boattr/dashing/dashing.rb'
 require File.dirname(__FILE__)+'/boattr/config/config.rb'
