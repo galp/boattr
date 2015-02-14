@@ -13,17 +13,17 @@ allowance      = Boattr::Data.new(config)
 
 enabled_sensors.each do |v|
   next unless v['type'] == 'temp'
-  @temp_sensor_data <<  sensors.temperature(v['name'], v['address'])
+  @temp_sensor_data <<  Boattr::Sensors::Temp.new(v['name'], v['address']).read
 end
 
 enabled_sensors.each do |v|
   next unless v['type'] == 'current'
-  @current_sensor_data  <<  sensors.current(v['name'], v['address'], model = v['model'], mode = v['mode'])
+  @current_sensor_data  <<  Boattr::Current.new(v['name'], v['address'], model = v['model'], mode = v['mode']).read
 end
 
 enabled_sensors.each do |v|
   next unless v['type'] == 'voltage'
-  @voltage_sensor_data  <<  sensors.voltage(v['name'],v['address'])
+  @voltage_sensor_data  <<  Boattr::Voltage.new(v['name'], v['address']).read
 end
                
 @misc_sensor_data = [
@@ -55,7 +55,5 @@ puts "temp index : #{temp_index} stove hot : #{stove.is_hot}"
 pump.on if temp_index > 19 && stove.is_hot
 pump.off if temp_index < 19   
 pump.off unless stove.is_hot
-
-
 
 

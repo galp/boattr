@@ -5,7 +5,6 @@ module Boattr
       def initialize(name, address)
         @name     = name
         @address  = address
-        read
       end
       def read
         begin

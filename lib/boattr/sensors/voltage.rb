@@ -1,17 +1,15 @@
 module Boattr
-  class Sensors
-    class Voltage
-      attr_reader :name, :address
-      def initialize(name, address)
-        @name     = name
-        @address  = address
-      end
-      def read
-        return if data.empty?
-        @raw     = data[address['adc']][address['pin']]
-        @volts = @raw * 0.015357
-        { 'name' => name, 'type' => 'volts', 'raw' => @raw, 'value' => @volts.round(2) }
-      end
+  class Voltage < Sensors
+    attr_reader :name, :address
+    def initialize(name, address)
+      @name     = name
+      @address  = address
+    end
+    def read
+      return if @@data.empty?
+      @raw     = @@data[address['adc']][address['pin']]
+      @volts   = @raw * 0.015357
+      { 'name' => name, 'type' => 'volts', 'raw' => @raw, 'value' => @volts.round(2) }
     end
   end
 end

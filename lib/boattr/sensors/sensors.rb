@@ -1,11 +1,11 @@
 module Boattr
   class Sensors
-    attr_reader :i2c_adc_address, :i2c_device, :data, :basename, :onewire_devices
+    attr_reader :i2c_adc_address, :i2c_device, :data, :basename
     def initialize(params)
       @basename        = params['boattr']['basename']
       @i2c_adc         = params['i2c']['i2cAdc']
       @i2c_device      = ::I2C.create(params['i2c']['i2cBus'])
-      read_i2c_adc(@i2c_adc)
+      @@data = read_i2c_adc(@i2c_adc)
     end
     def read_i2c_adc(address)
       @data     = {}
@@ -41,37 +41,9 @@ module Boattr
       end
       p @data
     end
-    def pressure(name, address)
-      return if data.empty?
-      @name    = name
-      @raw     = data[address['adc']][address['pin']]
-      @volts = @raw * 0.015357
-      { 'name' => @name, 'type' => 'pressure', 'raw' => @raw, 'value' => @volts.round(2) }
-    end
     def constrain(x,min,max)
       x = min if x < min
       x = max if x > max
-    end
-    def voltage(name, address)
-      return if data.empty?
-      @name    = name
-      @raw     = data[address['adc']][address['pin']]
-      @volts = @raw * 0.015357
-      { 'name' => @name, 'type' => 'volts', 'raw' => @raw, 'value' => @volts.round(2) }
-    end
-
-    def current(name, address, model = 'acs714', mode = 'both')
-      return if data.empty?
-      @supported_models = { 'acs714' => 0.066, 'acs709' => 0.028, 'acs712' => 0.185 }
-      @name    = name
-      @mode    = mode
-      @divider = @supported_models[model]
-      @raw     = data[address['adc']][address['pin']]
-      @volts   = (@raw * 0.004887)
-      # a load should only be negative and  a source should be possitive
-      @volts   = 2.5 if @mode == 'src' && @volts < 2.5 || @mode == 'load' && @volts > 2.5
-      @amps    = (@volts - 2.5) / @divider
-      { 'name' => @name, 'type' => 'current', 'mode' => @mode, 'raw' => @raw, 'value' => @amps.round(2) }
     end
   end
 end
