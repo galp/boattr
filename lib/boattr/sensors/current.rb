@@ -1,7 +1,7 @@
 module Boattr
   class Current < Sensors
     attr_reader :name, :address, :divider
-    @@supported_models = { 'acs714' => 0.066, 'acs709' => 0.028, 'acs712' => 0.185 }
+    @@supported_models = { 'acs714' => 0.066, 'acs709' => 0.028, 'acs712-20' => 0.100, 'acs712-05' => 0.185, 'acs712-30' => 0.066 }
     def initialize(name, address, model = 'acs714', mode = 'both')
       @name     = name
       @address  = address

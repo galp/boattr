@@ -34,19 +34,19 @@ sensors:
        address:
          adc: adc0
          pin: 2
-       model:  acs714
+       model:  acs712-20
        mode:  src
      genny:
        address:
          adc: adc0
          pin: 1
-       model:  acs709
+       model:  acs714
        mode:  src
      lights:
        address:
          adc: adc0
          pin: 2
-       model:  acs714
+       model:  acs712-20
        mode:  load
      pumps:
        address:
