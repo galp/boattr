@@ -68,23 +68,9 @@ class boattr (
     refreshonly => true,
     require     => File["${bin_dir}/${masq_script}"],
     }
-  file_line { 'load_one_wire_device_tree' :
-    ensure  => present,
-    line    => "echo BB-W1:00A0 > $cape_slots",
-    path    => '/etc/rc.local',
-    require => [File['/lib/firmware/BB-W1-00A0.dtbo'],File_line['remove_exit']],
-  }
-
-  file_line { 'remove_exit' :
-    ensure  => absent,
-    line    => 'exit 0',
-    path    => '/etc/rc.local',
-  }
-  file_line { 'start_masq_sh_on_boot' :
-    ensure  => present,
-    line    => "${bin_dir}/${masq_script} ${lan_iface} ${wan_iface}",
-    path    => '/etc/rc.local',
-    require => [File['/lib/firmware/BB-W1-00A0.dtbo'],File["${bin_dir}/${masq_script}"],File_line['remove_exit']],
-    }
-
+    file {'/etc/rc.local':
+      ensure  => present
+      content => template("${module_name}/boattr_rc_local.erb"),
+      require => [File['/lib/firmware/BB-W1-00A0.dtbo'],File["${bin_dir}/${masq_script}"]],
+    }      
 }
