@@ -9,7 +9,7 @@ module Boattr
       @mode     = mode
     end
     def read
-      return if @@data.empty?
+      return if @@data.nil?
       @raw     = @@data[address['adc']][address['pin']]
       @volts   = (@raw * 0.004887)
       # a load should only be negative and  a source should be positive
