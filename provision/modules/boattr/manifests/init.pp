@@ -69,7 +69,7 @@ class boattr (
     require     => File["${bin_dir}/${masq_script}"],
     }
     file {'/etc/rc.local':
-      ensure  => present
+      ensure  => present,
       content => template("${module_name}/boattr_rc_local.erb"),
       require => [File['/lib/firmware/BB-W1-00A0.dtbo'],File["${bin_dir}/${masq_script}"]],
     }      
