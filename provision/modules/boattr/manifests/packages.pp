@@ -5,7 +5,7 @@ class boattr::packages (
   require boattr::apt
 
   $packagelist     = [ 'screen', 'mosh','iptables','curl']
-  $rubypackagelist = [ 'ruby','bundler','ruby-dev','rubygems','build-essential','libc6-dev']
+  $rubypackagelist = [ 'ruby','bundler','ruby-dev','zlib1g-dev','rubygems','build-essential','libc6-dev']
   $devpackagelist  = ['i2c-tools','emacs24-nox', 'puppet-el']
 
   apt::force { $rubypackagelist: release => 'testing' }
