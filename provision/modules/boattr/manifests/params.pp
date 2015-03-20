@@ -20,7 +20,7 @@ class boattr::params {
   $boattr_run      = 'boat'
   $wifi_iface      = 'wlan0'
   $wifi_ssid       = $basename
-  $wpa_psk         = 'ce2708ec6629fc47b66e42509df7870b4b99da54bd49c32bea604f08416a63f0'
+  $wpa_psk         = 'c509d57e399416e0c5203a5023c65ad516bb4167632a8a24ba05c9e66b28ae09' # create with wpa_passphrase command
   $wifi_channel    = '11'
   $dash_host       = 'localhost'
   $dash_parent_dir = '/root'
