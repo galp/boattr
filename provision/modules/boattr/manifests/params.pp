@@ -2,6 +2,7 @@ class boattr::params {
   $basename        = 'boattr'
   $description     = 'boattr foo bar'
   $boattr_repo     = 'git://github.com/galp/boattr.git'
+  $board           = 'BeagleBoneBlack'
   $devel           = false
   $domain          = 'btr'
   $data_dir        = '/data'

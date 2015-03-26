@@ -1,4 +1,5 @@
 node default {
+  $board = 'BeagleboneBlack'
   class { 'ntp': iburst_enable => true }
   class { 'boattr::packages':  devel => true } -> class { 'boattr::users': } -> class { 'boattr': } -> class { 'boattr::dashing': }
   class { 'boattr::interfaces' : } -> class { 'boattr::dnsmasq': } ->   class { 'boattr::ap' : }

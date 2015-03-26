@@ -1,4 +1,7 @@
-class boattr::apt {
+class boattr::apt (
+  $board    = $::boattr::params::board,
+
+{
   
   class { '::apt::release':
     release_id => 'wheezy',
@@ -38,12 +41,17 @@ class boattr::apt {
     repos             => 'main contrib non-free',
     include_deb       => true
   }
-  apt::source { 'beaglebone_debian':
-    comment           => 'beaglebone debian',
-    location          => '[arch=armhf] http://debian.beagleboard.org/packages',
-    release           => "${::lsbdistcodename}-bbb",
-    repos             => 'main',
-    include_deb       => true
-  }
 
+  case $board {
+    'BeagleBoneBlack': {
+      apt::source { 'beaglebone_debian':
+        comment           => 'beaglebone debian',
+        location          => '[arch=armhf] http://debian.beagleboard.org/packages',
+        release           => "${::lsbdistcodename}-bbb",
+        repos             => 'main',
+        include_deb       => true
+      }
+    }
+    default: {}
+  }
 }
