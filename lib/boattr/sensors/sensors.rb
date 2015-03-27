@@ -4,7 +4,8 @@ module Boattr
     def initialize(params)
       @basename        = params['boattr']['basename']
       @i2c_adc         = params['i2c']['i2cAdc']
-      @i2c_device      = ::I2C.create(params['i2c']['i2cBus'])
+      @i2c_device      = ::Beaglebone::I2CDevice.new(:I2C1) #FIXME bus hardcoded
+      #@i2c_device      = ::I2C.create(params['i2c']['i2cBus'])
       @@data = read_i2c_adc(@i2c_adc)
     end
     def read_i2c_adc(address)

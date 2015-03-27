@@ -10,7 +10,7 @@ require 'socket'
 require 'open-uri'
 require 'httparty'
 require 'nokogiri'
-
+require 'beaglebone'
 
 require File.dirname(__FILE__)+'/boattr/sensors/sensors.rb'
 require File.dirname(__FILE__)+'/boattr/sensors/temp.rb'
