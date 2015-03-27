@@ -2,24 +2,24 @@ module Boattr
   class Sensors
     attr_reader :i2c_adc_address, :i2c_device, :data, :basename
     def initialize(params)
-      @basename        = params['boattr']['basename']
-      @i2c_adc         = params['i2c']['i2cAdc']
-      @i2c_device      = ::Beaglebone::I2CDevice.new(:I2C1) #FIXME bus hardcoded
-      #@i2c_device      = ::I2C.create(params['i2c']['i2cBus'])
-      @@data = read_i2c_adc(@i2c_adc)
+      @i2c_adc  = params['i2c']['i2cAdc']
+      @@data    = read_i2c_adc(@i2c_adc)
     end
     def read_i2c_adc(address)
       @data     = {}
       @iterate  = 16
       address.each do |k,v|
         next if v['disabled'] 
+        @dev         = v['dev'].to_sym
         @adc_data    = []
         @data_set    = Array.new(10) { Array.new }
         @adc_samples = []
         @iterate.times do # we take @iterate samples
           # read 20 bytes from slave, convert to decimals, and finaly in 10bit values.
           begin
-            @adc = i2c_device.read(v['address'], 0x14, 0x00).unpack('C*').map { |e| e.to_s 10 }
+            @i2c_device = ::Beaglebone::I2CDevice.new(@dev) 
+            @adc        = i2c_device.read(v['address'], 0x14, 0x00).unpack('C*').map { |e| e.to_s 10 }
+            @i2c_device.disable
           rescue
             puts "i2c device #{k} at address #{v['address']} not responding"
             return

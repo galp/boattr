@@ -2,8 +2,6 @@
 require 'json'
 require 'time'
 require 'yaml'
-require 'i2c'
-require 'gpio'
 require 'couchrest'
 require 'simple-graphite'
 require 'socket'
