@@ -51,3 +51,16 @@ Run puppet like below pointing to the right file.
 puppet apply --modulepath="/root/boattr/provision/modules/:/etc/puppet/modules/"  --verbose  provision/default.pp
 ```
 It might take a few runs until all dependencies are resolved and you should have all the components installed.
+
+# boattr setup
+## config file
+Boattr in this context is the ruby program that runs every minute
+collecting data from sensors, analyzing and sending to db and
+dashboard among other things.
+
+There is a configuration file that we need to edit. This file is
+located at /root/boattr/config.yml. By default it does not exists so
+we can use the config_sample.yml as a starting point.
+
+```cp /root/boattr/config_sample.yml /root/boattr/config.yml```
+
