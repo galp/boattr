@@ -41,13 +41,6 @@ class boattr (
     #notify   => Service['dashing'],
   }
 
-  cron { 'boattr_run':
-    command => "ruby ${boattr_dir}/${boattr_run}.rb >  /run/${basename}.log  2>&1",
-    user    => root,
-    hour    => '*',
-    minute  => '*/1'
-  }
-
   file {"${boattr_dir}/config.yml":
     ensure  => present,
     replace => 'no',
@@ -72,5 +65,8 @@ class boattr (
       ensure  => present,
       content => template("${module_name}/boattr_rc_local.erb"),
       require => [File['/lib/firmware/BB-W1-00A0.dtbo'],File["${bin_dir}/${masq_script}"]],
-    }      
+    }
+    file {"${boattr_dir}/run":
+      ensure => directory,
+    }
 }
