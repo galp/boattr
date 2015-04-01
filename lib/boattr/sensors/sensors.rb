@@ -4,6 +4,7 @@ module Boattr
     def initialize(params)
       @i2c_adc  = params['i2c']['i2cAdc']
       @@data    = read_i2c_adc(@i2c_adc)
+      @i2c_device = ::Beaglebone::I2CDevice.new(@dev) 
     end
     def read_i2c_adc(address)
       @data     = {}
@@ -17,7 +18,7 @@ module Boattr
         @iterate.times do # we take @iterate samples
           # read 20 bytes from slave, convert to decimals, and finaly in 10bit values.
           begin
-            @i2c_device = ::Beaglebone::I2CDevice.new(@dev) 
+            @i2c_device.write(v['address'], 0x00)
             @adc        = i2c_device.read(v['address'], 0x14, 0x00).unpack('C*').map { |e| e.to_s 10 }
             @i2c_device.disable
           rescue

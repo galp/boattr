@@ -1,7 +1,9 @@
 require File.dirname(__FILE__)+'/lib/'+'boattr.rb'
 require 'rufus-scheduler'
 hostname = Socket.gethostname
-puts "My name is  #{hostname}"
+puts "boattr started on #{hostname}"
+
+#start our buttons here?
 
 scheduler       = Rufus::Scheduler.new
 scheduler.every '1m' do
