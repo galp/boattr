@@ -11,6 +11,7 @@ require 'nokogiri'
 require 'beaglebone'
 
 require File.dirname(__FILE__)+'/boattr/sensors/sensors.rb'
+require File.dirname(__FILE__)+'/boattr/sensors/max127.rb'
 require File.dirname(__FILE__)+'/boattr/sensors/temp.rb'
 require File.dirname(__FILE__)+'/boattr/sensors/voltage.rb'
 require File.dirname(__FILE__)+'/boattr/sensors/current.rb'
