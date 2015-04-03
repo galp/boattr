@@ -1,0 +1,2 @@
+SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="<%= @phone_mac %>", NAME="phone0", RUN+="/sbin/ifup phone0"
+SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="<%= @wifi_mac %>", NAME="wifi0", RUN+="/usr/bin/service hostap restart"
