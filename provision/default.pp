@@ -1,6 +1,10 @@
 node default {
-  $phone_mac = unset # set with the tethered phone mac address.
-  $wifi_mac  = unser # the mac of the wifi dongle. 
+  $ip        = '192.168.8.1'
+  $ssid      = 'boattr'
+  $wpa_psk   = 'c509d57e399416e0c5203a5023c65ad516bb4167632a8a24ba05c9e66b28ae09'
+  $data_dev  = undef
+  $phone_mac = undef # set with the tethered phone mac address.
+  $wifi_mac  = undef # the mac of the wifi dongle. 
 
   class { 'boattr::ntp': }
   class { 'boattr::packages':  devel => true } -> class { 'boattr::users': } -> class { 'boattr': } -> class { 'boattr::dashing': } ->  class { 'boattr::udev': phone_mac => $phone_mac, wifi_mac => $wifi_mac }
@@ -13,12 +17,13 @@ node default {
 node brain01 {
   $ip        = '192.168.8.1'
   $ssid      = 'boat'
+  $wpa_psk   = 'c509d57e399416e0c5203a5023c65ad516bb4167632a8a24ba05c9e66b28ae09'
   $data_dev  = 'c60fd6ce-2764-4713-aaf8-3bafbc7c5a89' # output from blkid 
-  $phone_mac = unset # set with the tethered phone mac address.
-  $wifi_mac  = unser # the mac of the wifi dongle. 
+  $phone_mac = undef # set with the tethered phone mac address.
+  $wifi_mac  = undef # the mac of the wifi dongle. 
   class { 'ntp': iburst_enable => true }
   class { 'boattr::packages':  devel => true } -> class { 'boattr::users': } -> class { 'boattr': lan_ip => $ip} -> class { 'boattr::dashing': } ->  class { 'boattr::udev': phone_mac => $phone_mac, wifi_mac => $wifi_mac }
-  class { 'boattr::interfaces' : lan_ip => $ip } -> class { 'boattr::dnsmasq': } ->   class { 'boattr::ap' : }
+  class { 'boattr::interfaces' : lan_ip => $ip } -> class { 'boattr::dnsmasq': } ->   class { 'boattr::ap' : wpa_psk => $wpa_psk }
   class { 'boattr::storage': data_dev => $data_dev } -> class { 'boattr::couchdb': }
   
   
