@@ -2,7 +2,7 @@ class boattr::ntp {
 
   require boattr::packages
   
-  $packagelist = ['ntpd']
+  $packagelist = ['ntp']
   package { $packagelist :
     ensure  => latest,
   }
