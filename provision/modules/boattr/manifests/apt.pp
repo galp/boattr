@@ -1,6 +1,6 @@
 class boattr::apt (
   $board    = $::boattr::params::board,
-
+)
 {
   
   class { '::apt::release':

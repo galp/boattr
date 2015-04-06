@@ -67,6 +67,7 @@ class boattr (
       require => [File['/lib/firmware/BB-W1-00A0.dtbo'],File["${bin_dir}/${masq_script}"]],
     }
     file {"${boattr_dir}/run":
-      ensure => directory,
+      ensure  => directory,
+      require => Vcsrepo[$boattr_dir],
     }
 }

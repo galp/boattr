@@ -1,13 +1,15 @@
 class boattr::ntp {
 
+  require boattr::packages
+  
   $packagelist = ['ntpd']
   package { $packagelist :
     ensure  => latest,
   }
-
+  
   file { '/etc/default/ntp':
     ensure  => present,
-    content => 'NTPD_OPTS='-g -x''
+    content => 'NTPD_OPTS=\'-g -x\'',
     require => Package[$packagelist],
   }
   file { '/etc/ntp.conf':
@@ -16,11 +18,10 @@ class boattr::ntp {
     require => Package[$packagelist],
     notify  => Service['ntpd'],
   }
-    service { 'ntpd' :
+  service { 'ntpd' :
     ensure  => running,
     enable  => true,
-    require => File['/etc/ntp.conf'],File['/etc/default/ntp'],
+    require => [File['/etc/ntp.conf'], File['/etc/default/ntp']],
   }
-
 }
   
