@@ -16,9 +16,9 @@ class boattr::ntp {
     ensure  => present,
     content => template("${module_name}/boattr_ntp_conf.erb"),
     require => Package[$packagelist],
-    notify  => Service['ntpd'],
+    notify  => Service['ntp'],
   }
-  service { 'ntpd' :
+  service { 'ntp' :
     ensure  => running,
     enable  => true,
     require => [File['/etc/ntp.conf'], File['/etc/default/ntp']],
