@@ -15,9 +15,4 @@ class boattr::interfaces (
     content => template("${module_name}/interfaces"),
     require => Package[$packages],
   }
-  file {'/etc/udev/rules.d/10-boattr.rules' :
-    ensure  => present,
-    content => template("${module_name}/boattr_udev_rules.erb"),
-  }
-
 }

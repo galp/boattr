@@ -6,8 +6,8 @@ node default {
   $phone_mac = undef # set with the tethered phone mac address.
   $wifi_mac  = undef # the mac of the wifi dongle. 
 
-  class { 'boattr::ntp': }
-  class { 'boattr::packages':  devel => true } -> class { 'boattr::users': } -> class { 'boattr': } -> class { 'boattr::dashing': } ->  class { 'boattr::udev': phone_mac => $phone_mac, wifi_mac => $wifi_mac }
+  
+  class { 'boattr::packages':  devel => true } -> class { 'boattr::ntp': } -> class { 'boattr::users': } -> class { 'boattr': } -> class { 'boattr::dashing': } ->  class { 'boattr::udev': phone_mac => $phone_mac, wifi_mac => $wifi_mac }
   class { 'boattr::interfaces' : } -> class { 'boattr::dnsmasq': } ->   class { 'boattr::ap' : }
   class { 'boattr::storage': } -> class { 'boattr::couchdb': }
 
