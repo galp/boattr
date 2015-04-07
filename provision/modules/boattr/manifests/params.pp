@@ -13,8 +13,10 @@ class boattr::params {
   $lan_iface       = 'br0'
   $lan_gw          = undef
   $lan_dns         = '127.0.0.1'
-  $wan_iface       = 'usb0'
+  $wan_iface       = 'phone0'
   $wired_iface     = 'eth0'
+  $usb_iface       = 'usb0'
+  $bridge_ports    = "${wired_iface} ${usb_iface}"
   $db_dir          = "${data_dir}/couchdb"
   $db_host         = 'localhost'
   $boattr_dir      = "/root/${basename}"

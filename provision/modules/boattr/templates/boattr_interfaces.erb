@@ -13,12 +13,12 @@ iface wlan0 inet manual
 auto wlan1
 iface wlan1 inet manual
 
-#usb 3g/4g
-allow-hotplug usb0
+
+# usb network
 auto usb0
-iface usb0 inet dhcp
+iface usb0 inet manual
+
 allow-hotplug usb1
-auto usb1
 iface usb1 inet dhcp
 
 # bridge
@@ -30,5 +30,5 @@ iface br0 inet static
 	gateway <%= @lan_gw %>
 	<% end %>
 	dns-nameservers <%= @lan_dns %>
-        bridge_ports <%= @wired_iface %>
+        bridge_ports <%= @bridge_ports %>
 

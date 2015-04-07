@@ -14,7 +14,11 @@ class boattr (
   $cape_slots    = $::boattr::params::cape_slots,
   $lan_iface     = $::boattr::params::lan_iface,
   $lan_ip        = $::boattr::params::lan_ip,
+  $lan_gw        = $::boattr::params::lan_gw,
+  $lan_dns       = $::boattr::params::lan_dns,
+  $wired_iface   = $::boattr::params::wired_iface,
   $wan_iface     = $::boattr::params::wan_iface,
+  $bridge_ports  = $::boattr::params::bridge_ports,
   $tor_gateway   = $::boattr::params::tor_gateway,
   $bin_dir       = $::boattr::params::bin_dir,
   $masq_script   = $::boattr::params::masq_script,
@@ -26,7 +30,18 @@ class boattr (
     class { 'boattr::tor': lan_ip => $lan_ip }
     notice('tor gateway is enabled')
   }
+  if $ssid {
+    class { 'boattr::ap': wpa_psk => $wpa_psk, ssid => $ssid }
+    notice('wireless AP is enabled')
+  }
+  else {
+    notice('wireless AP is disabled')
+  }
 
+  file {'/etc/network/interfaces' :
+    ensure  => present,
+    content => template("${module_name}/boattr_interfaces.erb"),
+  }
   vcsrepo { $boattr_dir:
     ensure   => present,
     provider => git,
