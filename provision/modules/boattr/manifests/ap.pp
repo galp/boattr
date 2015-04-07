@@ -1,6 +1,6 @@
 class boattr::ap (
   $wifi_iface = $::boattr::params::wifi_iface,
-  $ssid       = $::boattr::params::wifi_ssid,
+  $wifi_ssid  = $::boattr::params::wifi_ssid,
   $wpa_psk    = $::boattr::params::wpa_psk,
   $channel    = $::boattr::params::wifi_channel
   ) inherits boattr::params

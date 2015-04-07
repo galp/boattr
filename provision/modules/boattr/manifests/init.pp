@@ -23,7 +23,7 @@ class boattr (
   $bin_dir       = $::boattr::params::bin_dir,
   $masq_script   = $::boattr::params::masq_script,
   $with_tor      = $::boattr::params::with_tor,
-  $ssid          = $::boattr::params::wifi_ssid,
+  $wifi_ssid     = $::boattr::params::wifi_ssid,
   ) inherits boattr::params
 {
   require boattr::packages
@@ -31,8 +31,8 @@ class boattr (
     class { 'boattr::tor': lan_ip => $lan_ip }
     notice('tor gateway is enabled')
   }
-  if $ssid {
-    class { 'boattr::ap': wpa_psk => $wpa_psk, ssid => $wifi_ssid }
+  if $wifi_ssid {
+    class { 'boattr::ap': wpa_psk => $wpa_psk, wifi_ssid => $wifi_ssid }
     notice('wireless AP is enabled')
   }
   else {
