@@ -37,7 +37,7 @@ node brain02 {
   $data_dev = undef
   class { 'ntp': iburst_enable => true }
   class { 'boattr::packages':  devel => true } -> class { 'boattr::users': } -> class { 'boattr': lan_ip => $ip, wired_iface => $wired_iface} -> class { 'boattr::dashing': }
-  class { 'boattr::dnsmasq': } ->   class { 'boattr::ap' : }
+  class { 'boattr::dnsmasq': }
   class { 'boattr::storage': data_dev => $data_dev } -> class { 'boattr::couchdb': }
 
 }
@@ -46,10 +46,10 @@ node boattr-vagrant {
   $lan_gw      = '192.168.8.1'
   $wired_iface = 'eth1'
   $wan_iface   = $wired_iface
-
-  class { 'boattr::packages': } -> class { 'boattr::users': devel => 'devel'} -> class { 'boattr': lan_ip => $ip, wired_iface => $wired_iface}
+  $ssid        = 'foo'
+  class { 'boattr::packages': } -> class { 'boattr::users': devel => 'devel'} -> class { 'boattr': lan_ip => $ip, wired_iface => $wired_iface, ssid => $wifi_ssid }
   ->   class { 'boattr::storage':  } -> class { 'boattr::couchdb': } -> class { 'boattr::dashing': }
-  class { 'boattr::dnsmasq': } ->   class { 'boattr::ap' : }
+  class { 'boattr::dnsmasq': }
 
   
   
