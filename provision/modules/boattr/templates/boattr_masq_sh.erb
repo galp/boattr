@@ -1,12 +1,10 @@
 #!/bin/bash
 set -e                                                 
-
-
 echo 1 > /proc/sys/net/ipv4/ip_forward
 LOCAL_NET="<%= @lan_subnet %>.0/24"
-if [ -z "$1" ] ; then
-    LAN='<%= @lan_iface%>'
-    WAN='<%= @wan_iface%>'
+if [ $# == 2 ] ; then
+    LAN=$1
+    WAN=$2
 else 
     LAN='<%= @lan_iface%>'
     WAN='<%= @wan_iface%>'
