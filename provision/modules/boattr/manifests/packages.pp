@@ -4,7 +4,7 @@ class boattr::packages (
 {
   require boattr::apt
 
-  $packagelist     = [ 'screen', 'mosh','iptables','curl','bridge-utils']
+  $packagelist     = [ 'screen', 'mosh','iptables','curl','bridge-utils','wireless-tools']
   $rubypackagelist = [ 'ruby','bundler','ruby-dev','zlib1g-dev','rubygems','build-essential','libc6-dev']
   $devpackagelist  = ['i2c-tools','emacs24-nox', 'puppet-el']
 
