@@ -10,11 +10,11 @@ module Boattr
     end
 
     def read
-      return if @@data.nil?
+      return if @@data.nil? || @@data.empty? || @@data[address].nil?
       @raw     = @@data[address['adc']][address['pin']]
-      @volts   = (@raw * 0.004887)
+      @volts   = (@raw.to_i * 0.004887)
       # a load should only be negative and  a source should be positive
-      @volts   = 2.5 if @mode == 'src' && @volts < 2.5 || @mode == 'load' && @volts > 2.5
+      @volts   = 2.5 if @mode == 'src' && @volts < 2.5 || @mode == 'load' && @volts > 2.5 #HACK
       @amps    = (@volts - 2.5) / divider
       { 'name' => @name, 'type' => 'current', 'mode' => @mode, 'raw' => @raw, 'value' => @amps.round(2) }
     end

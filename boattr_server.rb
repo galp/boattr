@@ -50,7 +50,7 @@ scheduler.every '1m' do
 
   Boattr::Data.new(config).to_graphite(@sensor_data)
 
-  pump  = Boattr::Control::Pump.new('calorifier pump', 30)
+  pump  = Boattr::Control::Pump.new('calorifier pump', '30')
   stove = Boattr::Control::Stove.new(@temp_sensor_data)
   control = Boattr::Control.new
   temp_index = control.temp_index(@temp_sensor_data)

@@ -3,7 +3,7 @@ require 'daemons'
 
 options = {
   log_output: true,
-  backtrace: true,
+  backtrace: false,
   output_logfilename: 'boattr.log',
   monitor: true,
   dir_mode: :script,

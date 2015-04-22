@@ -43,7 +43,7 @@ dash.list_to_dashboard(@current_sensor_data, 'amps')
 dash.list_to_dashboard(@temp_sensor_data, 'temps')
 dash.to_dashboard(@sensor_data)
 
-pump  = Boattr::Control::Pump.new('calorifier pump', 30)
+pump  = Boattr::Control::Pump.new('calorifier pump', '30')
 stove = Boattr::Control::Stove.new(@temp_sensor_data)
 control = Boattr::Control.new
 temp_index = control.temp_index(@temp_sensor_data)
