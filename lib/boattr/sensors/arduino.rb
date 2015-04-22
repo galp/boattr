@@ -1,6 +1,6 @@
 module Boattr
-  class Sensors
-    class Arduino
+  class Sensors 
+    class Arduino < Sensors
       attr_reader :i2c_address, :i2c_device, :data
       def initialize(params)
         @i2c_device  = ::Beaglebone::I2CDevice.new(:I2C2)
