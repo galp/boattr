@@ -3,8 +3,13 @@ auto lo
 iface lo inet loopback
 
 # primary network interface
-auto eth0
-iface eth0 inet manual
+auto <%= @wired_iface %>
+iface <%= @wired_iface %> inet manual
+
+<% if @hostname == "boattr-vagrant"  %>
+auto  eth0 
+iface eth0 inet dhcp
+<% end %>
 
 # wireless network interfaces
 auto wlan0
@@ -17,6 +22,10 @@ iface wlan1 inet manual
 # usb network
 auto usb0
 iface usb0 inet manual
+
+#tethering phone <%= @phone_mac %>
+allow-hotplug phone0
+iface phone0 inet dhcp
 
 allow-hotplug usb1
 iface usb1 inet dhcp
