@@ -18,25 +18,36 @@ class boattr (
   $lan_dns       = $::boattr::params::lan_dns,
   $wired_iface   = $::boattr::params::wired_iface,
   $wan_iface     = $::boattr::params::wan_iface,
-  $bridge_ports  = $::boattr::params::bridge_ports,
   $tor_gateway   = $::boattr::params::tor_gateway,
   $bin_dir       = $::boattr::params::bin_dir,
   $masq_script   = $::boattr::params::masq_script,
   $with_tor      = $::boattr::params::with_tor,
   $wifi_ssid     = $::boattr::params::wifi_ssid,
+  $phone_mac    = $::boattr::params::phone_mac,
+  $data_dev      = $::boattr::params::data_dev,
   ) inherits boattr::params
 {
+  $bridge_ports    = "${wired_iface} ${usb_iface}"
   require boattr::packages
-  if $with_tor {
+  if $with_tor == 'unset' {
+    notice('tor gateway is disabled')
+  }
+  else {
     class { 'boattr::tor': lan_ip => $lan_ip }
     notice('tor gateway is enabled')
   }
-  if $wifi_ssid {
+  if $wifi_ssid == 'unset' {
+    notice('wireless AP is disabled')
+  }
+  else {
     class { 'boattr::ap': wpa_psk => $wpa_psk, wifi_ssid => $wifi_ssid }
     notice('wireless AP is enabled')
   }
+  if $data_dev == 'unset' {
+    class { 'boattr::storage': }
+  }
   else {
-    notice('wireless AP is disabled')
+    class { 'boattr::storage': data_dev => $data_dev }
   }
 
   file {'/etc/network/interfaces' :

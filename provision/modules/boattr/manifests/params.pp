@@ -16,7 +16,6 @@ class boattr::params {
   $wan_iface       = 'phone0'
   $wired_iface     = 'eth0'
   $usb_iface       = 'usb0'
-  $bridge_ports    = "${wired_iface} ${usb_iface}"
   $db_dir          = "${data_dir}/couchdb"
   $db_host         = 'localhost'
   $boattr_dir      = "/root/${basename}"
