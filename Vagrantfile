@@ -9,7 +9,8 @@ Vagrant.configure(2) do |config|
   config.vm.provision "puppet" do |puppet|
     puppet.manifests_path = "provision/"
     puppet.module_path = ["provision/modules","/etc/puppet/modules"]
-
+    puppet.hiera_config_path = "hiera/hiera.yaml"
+    puppet.working_directory = "/vagrant"
   end
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "512"
