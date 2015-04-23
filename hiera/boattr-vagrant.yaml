@@ -5,5 +5,5 @@ boattr::lan_gw: "192.168.8.1"
 boattr::wifi_ssid: unset
 boattr::wired_iface: "eth1"
 boattr::wan_iface: "eth1"
-boattr::packages:devel: false
-
+boattr::devel: false
+boattr::board: unset
