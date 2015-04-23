@@ -28,7 +28,7 @@ class boattr::ap (
   }
   file {'/etc/default/hostapd' : 
     ensure  => present,
-    content => 'DAEMON_CONF=\"/etc/hostapd/hostapd.conf\"',
+    content => 'DAEMON_CONF=/etc/hostapd/hostapd.conf',
     notify  => Service['hostapd'],
     require => Package[$packages],
   }
