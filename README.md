@@ -48,7 +48,7 @@ Make sure the fully quilified  dns names much.
 
 Run puppet like below pointing to the right file.
 ```
-puppet apply --modulepath="/root/boattr/provision/modules/:/etc/puppet/modules/"  --verbose  provision/default.pp
+puppet apply --modulepath="/root/boattr/provision/modules/:/etc/puppet/modules/"  --hiera_config="/root/boattr/hiera/hiera.yaml" --verbose  provision/default.pp
 ```
 It might take a few runs until all dependencies are resolved and you should have all the components installed.
 

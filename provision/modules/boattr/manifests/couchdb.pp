@@ -14,9 +14,10 @@ class boattr::couchdb (
     require => Package['couchdb'],
   }
   file { $db_dir :
-    ensure => directory,
-    owner  => 'couchdb',
-    group  => 'couchdb',
+    ensure  => directory,
+    recurse => true,
+    owner   => 'couchdb',
+    group   => 'couchdb',
   }
   service {'couchdb' :
     ensure => running,

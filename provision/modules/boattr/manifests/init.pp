@@ -23,8 +23,9 @@ class boattr (
   $masq_script   = $::boattr::params::masq_script,
   $with_tor      = $::boattr::params::with_tor,
   $wifi_ssid     = $::boattr::params::wifi_ssid,
-  $phone_mac    = $::boattr::params::phone_mac,
+  $phone_mac     = $::boattr::params::phone_mac,
   $data_dev      = $::boattr::params::data_dev,
+  $wpa_psk       = $::boattr::params::wpa_psk,
   ) inherits boattr::params
 {
   $bridge_ports    = "${wired_iface} ${usb_iface}"

@@ -4,10 +4,12 @@ class boattr::packages (
 {
   require boattr::apt
 
-  $packagelist     = [ 'screen', 'mosh','iptables','curl','bridge-utils','wireless-tools']
-  $rubypackagelist = [ 'ruby','bundler','ruby-dev','zlib1g-dev','rubygems','build-essential','libc6-dev']
-  $devpackagelist  = ['i2c-tools','emacs24-nox', 'puppet-el']
-
+  $packagelist       = [ 'screen', 'mosh','iptables','curl','bridge-utils','wireless-tools']
+  $rubypackagelist   = [ 'ruby','bundler','ruby-dev','zlib1g-dev','rubygems','build-essential','libc6-dev']
+  $devpackagelist    = ['i2c-tools','emacs24-nox', 'puppet-el']
+  $puppetpackagelist = ['puppet']
+  
+  apt::force { $puppetpackagelist: release => 'testing' }
   apt::force { $rubypackagelist: release => 'testing' }
   package { $packagelist : ensure => installed }
 

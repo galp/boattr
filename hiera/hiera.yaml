@@ -1,0 +1,10 @@
+# /etc/hiera.yaml
+---
+:backends:
+  - yaml
+:yaml:
+  :datadir: hiera
+:hierarchy:
+  - "%{::hostname}"
+  - "virtual_%{::is_virtual}"
+  - default
