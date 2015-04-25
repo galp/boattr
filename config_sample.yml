@@ -2,13 +2,15 @@ boattr:
    basename: boat
    description: "boattr dev box"
 i2c:
-   i2cBus: /dev/i2c-1
    i2cAdc:
-     adc0:
-       address: 0x2c
      adc1:
-       address: 0x2f
-       disabled: true
+       address: 0x28
+       dev:  "I2C2"
+     adc2:
+       address: 0x20
+       dev: "I2C2"
+       type: "arduino"
+       description: "arduino uno analog ports via i2c"
 couchdb:
    host: localhost
 dashing:
