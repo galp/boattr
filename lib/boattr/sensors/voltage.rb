@@ -6,8 +6,7 @@ module Boattr
       @address  = address
     end
     def read
-      return if @@data.nil? || @@data.empty?
-      p address
+      return if @@data.nil? || @@data.empty? || @@data[address].nil?
       @raw     = @@data[address['adc']][address['pin']]
       @volts   = @raw.to_i * 0.01464 #0.015357
       { 'name' => name, 'type' => 'volts', 'raw' => @raw, 'value' => @volts.round(2) }
