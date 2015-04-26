@@ -95,8 +95,12 @@ module Boattr
         @type  = x['type']
         @name  = x['name']
         @value = x['value']
-        @g.push_to_graphite do |graphite|
-          graphite.puts "#{@basename}.#{@type}.#{@name} #{@value} #{@g.time_now}"
+        begin 
+          @g.push_to_graphite do |graphite|
+            graphite.puts "#{@basename}.#{@type}.#{@name} #{@value} #{@g.time_now}"
+          end
+        rescue
+          return
         end
       end
     end
