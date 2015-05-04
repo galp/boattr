@@ -5,10 +5,11 @@ module Boattr
       @name     = name
       @address  = address
     end
+
     def read
       return if @@data.nil?
       @raw     = @@data[address['adc']][address['pin']]
-      @volts   = @raw * 0.01464 #0.015357
+      @volts   = @raw * 0.01464 # 0.015357
       { 'name' => name, 'type' => 'volts', 'raw' => @raw, 'value' => @volts.round(2) }
     end
   end

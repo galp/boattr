@@ -24,7 +24,7 @@ module Boattr
       end
     end
 
-    def create_views(sensor_data,type)
+    def create_views(sensor_data, type)
       # at this point this only creates  views of the same type, in one design doc.
       @data       = sensor_data
       @views      = {}
@@ -71,6 +71,7 @@ module Boattr
       end
       @merged
     end
+
     def amphour_balance(amphours_data)
       @loads, @sources = 0, 0
       @amphours       = amphours_data
@@ -95,7 +96,7 @@ module Boattr
         @type  = x['type']
         @name  = x['name']
         @value = x['value']
-        begin 
+        begin
           @g.push_to_graphite do |graphite|
             graphite.puts "#{@basename}.#{@type}.#{@name} #{@value} #{@g.time_now}"
           end

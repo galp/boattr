@@ -4,13 +4,14 @@ module Boattr
     def initialize(params)
       @i2c_adc  = params['i2c']['i2cAdc']
       @@data    = read_i2c_adc(@i2c_adc)
-      @i2c_device = ::Beaglebone::I2CDevice.new(@dev) 
+      @i2c_device = ::Beaglebone::I2CDevice.new(@dev)
     end
+
     def read_i2c_adc(address)
       @data     = {}
       @iterate  = 16
-      address.each do |k,v|
-        next if v['disabled'] 
+      address.each do |k, v|
+        next if v['disabled']
         @dev         = v['dev'].to_sym
         @adc_data    = []
         @data_set    = Array.new(10) { Array.new }
@@ -43,7 +44,8 @@ module Boattr
       end
       p @data
     end
-    def constrain(x,min,max)
+
+    def constrain(x, min, max)
       x = min if x < min
       x = max if x > max
     end

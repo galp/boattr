@@ -4,10 +4,9 @@ module Boattr
       sum = 0
       temp_sensors.each do |x|
         next if x.nil?
-        sum +=x['value']
+        sum += x['value']
       end
-      avg = sum/temp_sensors.length
+      avg = sum / temp_sensors.length
     end
   end
 end
-

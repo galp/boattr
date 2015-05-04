@@ -5,3 +5,5 @@
 [#]*[#]
 
 /.vagrant/
+.tmp/
+modules/

@@ -8,6 +8,7 @@ module Boattr
       @divider  = @@supported_models[model]
       @mode     = mode
     end
+
     def read
       return if @@data.nil?
       @raw     = @@data[address['adc']][address['pin']]
