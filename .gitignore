@@ -7,3 +7,4 @@
 /.vagrant/
 .tmp/
 modules/
+/run/
