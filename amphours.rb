@@ -1,9 +1,7 @@
-require File.dirname(__FILE__)+'/lib/'+'boattr.rb'
+require File.dirname(__FILE__) + '/lib/' + 'boattr.rb'
 
-config = Boattr::Config.read(File.dirname(__FILE__)+'/config.yml')
+config = Boattr::Config.read(File.dirname(__FILE__) + '/config.yml')
 enabled_sensors = Boattr::Config.enabled_sensors(config)
-
-
 
 @week  = 720 # 1 week
 @hours = 24

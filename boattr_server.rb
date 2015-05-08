@@ -1,13 +1,13 @@
-require File.dirname(__FILE__)+'/lib/'+'boattr.rb'
+require File.dirname(__FILE__) + '/lib/' + 'boattr.rb'
 require 'rufus-scheduler'
 hostname = Socket.gethostname
 puts "boattr started on #{hostname}"
 
-#start our buttons here?
+# start our buttons here?
 
 scheduler       = Rufus::Scheduler.new
 scheduler.every '1m' do
-  config          = Boattr::Config.read(File.dirname(__FILE__)+'/'+'config.yml')
+  config          = Boattr::Config.read(File.dirname(__FILE__) + '/' + 'config.yml')
   enabled_sensors = Boattr::Config.enabled_sensors(config)
   sensors         = Boattr::Sensors.new(config)
   allowance       = Boattr::Data.new(config)
@@ -31,10 +31,10 @@ scheduler.every '1m' do
     next unless v['type'] == 'voltage'
     @voltage_sensor_data  <<  Boattr::Voltage.new(v['name'], v['address']).read
   end
-  
+
   @misc_sensor_data = [
-                       allowance.get_remaining_data('ee')
-                      ]
+    allowance.get_remaining_data('ee')
+  ]
 
   @sensor_data.concat(@current_sensor_data)
   @sensor_data.concat(@temp_sensor_data)
@@ -42,24 +42,23 @@ scheduler.every '1m' do
   @sensor_data.concat(@misc_sensor_data)
 
   Boattr::Data.new(config).to_db(@sensor_data)
-  Boattr::Data.new(config).to_graphite(@sensor_data)
 
   dash = Boattr::Dashing.new(config)
   dash.list_to_dashboard(@current_sensor_data, 'amps')
   dash.list_to_dashboard(@temp_sensor_data, 'temps')
   dash.to_dashboard(@sensor_data)
 
+  Boattr::Data.new(config).to_graphite(@sensor_data)
 
   pump  = Boattr::Control::Pump.new('calorifier pump', '30')
   stove = Boattr::Control::Stove.new(@temp_sensor_data)
   control = Boattr::Control.new
   temp_index = control.temp_index(@temp_sensor_data)
 
-
   puts "temp index : #{temp_index} stove hot : #{stove.is_hot}"
 
   pump.on if temp_index > 19 && stove.is_hot
-  pump.off if temp_index < 19   
+  pump.off if temp_index < 19
   pump.off unless stove.is_hot
 end
 

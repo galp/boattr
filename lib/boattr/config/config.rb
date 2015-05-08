@@ -8,15 +8,15 @@ module Boattr
                  puts "Could not parse config file: #{e.message}"
                end
     end
-    def self.enabled_sensors(config = self.read)
+    def self.enabled_sensors(config = read)
       @data = []
-      config['sensors'].each() do |k,v| 
-        v.each() do |x| 
+      config['sensors'].each do |k, v|
+        v.each do |x|
           next if x[1]['disabled']
-          @data <<  x[1].merge!({'type' => k, 'name' => x[0] })
+          @data <<  x[1].merge!('type' => k, 'name' => x[0])
         end
       end
-      return @data
+      @data
     end
   end
 end

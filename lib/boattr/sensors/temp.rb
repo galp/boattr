@@ -6,6 +6,7 @@ module Boattr
         @name     = name
         @address  = address
       end
+
       def read
         begin
           @file = File.open("/sys/bus/w1/devices/#{address}/w1_slave", 'r')

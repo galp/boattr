@@ -5,6 +5,7 @@ module Boattr
       @name     = name
       @address  = address
     end
+
     def read
       return if @@data.nil? || @@data.empty? || @@data[address].nil?
       @raw     = @@data[address['adc']][address['pin']]
