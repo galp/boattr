@@ -50,16 +50,19 @@ scheduler.every '1m' do
 
   Boattr::Data.new(config).to_graphite(@sensor_data)
 
-  pump  = Boattr::Control::Pump.new('calorifier pump', '30')
+  
   stove = Boattr::Control::Stove.new(@temp_sensor_data)
   control = Boattr::Control.new
   temp_index = control.temp_index(@temp_sensor_data)
 
   puts "temp index : #{temp_index} stove hot : #{stove.is_hot}"
-
-  pump.on if temp_index > 19 && stove.is_hot
-  pump.off if temp_index < 19
-  pump.off unless stove.is_hot
+  pump_pin = nil
+  if pump_pin.nil? || pump_pin.empty? do 
+       pump  = Boattr::Control::Pump.new('calorifier pump', pump_pin)
+       pump.on if temp_index > 19 && stove.is_hot
+       pump.off if temp_index < 19
+       pump.off unless stove.is_hot
+     end	
+  end
 end
-
 scheduler.join
