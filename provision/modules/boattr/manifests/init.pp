@@ -98,4 +98,15 @@ class boattr (
       ensure  => directory,
       require => Vcsrepo[$boattr_dir],
     }
+  service { 'udev' :
+    ensure  => running,
+    enable  => true,
+  }
+
+  file {'/etc/udev/rules.d/10-boattr.rules' :
+    ensure  => present,
+    content => template("${module_name}/boattr_udev_rules.erb"),
+    notify  => Service['udev']
+  }
+
 }
