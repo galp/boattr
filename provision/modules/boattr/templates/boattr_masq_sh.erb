@@ -27,5 +27,5 @@ iptables -t nat -A PREROUTING -i $LAN -p tcp --syn -j REDIRECT --to-ports 9040
 iptables -A FORWARD -i $WAN -o $LAN -m state --state RELATED,ESTABLISHED -j ACCEPT
 iptables -A FORWARD -i $LAN -o $WAN -j ACCEPT
 
-ip route del default
+ip route |grep default >/dev/null &&  ip route del default
 dhclient $WAN
