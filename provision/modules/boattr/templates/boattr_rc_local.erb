@@ -1,7 +1,8 @@
 #!/bin/bash
 
-#load 1w device tree
-echo BB-W1:00A0 > <%= @cape_slots %>
 
 #start firewall
 <%= @bin_dir%>/<%= @masq_script %> <%= @lan_iface%> <%= @wan_iface%> 
+
+#load 1w device tree
+echo BB-W1:00A0 > <%= @cape_slots %>
