@@ -102,6 +102,15 @@ class boattr (
     ensure  => running,
     enable  => true,
   }
+  service { 'boattr' :
+    ensure  => running,
+    enable  => true,
+  }
+  file {'/etc/systemd/system/boattr.service' :
+    ensure  => present,
+    content => template("${module_name}/boattr_service.erb"),
+    notify  => Service['boattr']
+  }
 
   file {'/etc/udev/rules.d/10-boattr.rules' :
     ensure  => present,
