@@ -1,0 +1,11 @@
+[Unit]
+Description=Boattr Service
+After=network.target
+
+[Service]
+ExecStart=/<%= @boattr_dir %>/boattr_control.rb run
+#ExecStop=/root/boattr/boattr_control.rb stop
+
+[Install]
+WantedBy=multi-user.target
+

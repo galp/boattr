@@ -9,4 +9,4 @@ options = {
   dir_mode: :script,
   dir: 'run'
 }
-Daemons.run('boattr_server.rb', options)
+Daemons.run('/root/boattr/boattr_server.rb', options)
