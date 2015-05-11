@@ -75,9 +75,14 @@ class boattr (
     content => template("${module_name}/boattr_config.yml"),
     require => Vcsrepo[$boattr_dir],
   }
-  file {'/lib/firmware/BB-W1-00A0.dtbo': #FIXME beaglebone only
-    ensure => present,
-    source => 'puppet:///modules/boattr/BB-W1-00A0.dtbo'
+    file {"${firmware_dir}":
+      ensure  => directory,
+    }
+  
+  file {"${firmware_dir}/BB-W1-00A0.dtbo": #FIXME beaglebone only
+    ensure  => present,
+    source  => 'puppet:///modules/boattr/BB-W1-00A0.dtbo',
+    require => File[$firmware_dir],
   }
   file {"${bin_dir}/${masq_script}":
     ensure  => present,
@@ -98,13 +103,19 @@ class boattr (
       ensure  => directory,
       require => Vcsrepo[$boattr_dir],
     }
-  service { 'udev' :
+    service { 'puppet' :
+      ensure  => stopped,
+      enable  => false,
+  }
+
+    service { 'udev' :
     ensure  => running,
     enable  => true,
   }
   service { 'boattr' :
     ensure  => running,
     enable  => true,
+    require => File['/etc/systemd/system/boattr.service'],
   }
   file {'/etc/systemd/system/boattr.service' :
     ensure  => present,
