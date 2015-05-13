@@ -17,7 +17,7 @@ scheduler.every '1m', :first_in => 0.1 do
   @temp_sensor_data    = []
   @sensor_data         = []
   @voltage_sensor_data = []
-
+  @depth_sensor_data   = []
   enabled_sensors.each do |v|
     next unless v['type'] == 'temp'
     @temp_sensor_data <<  Boattr::Sensors::Temp.new(v['name'], v['address']).read
@@ -31,6 +31,11 @@ scheduler.every '1m', :first_in => 0.1 do
   enabled_sensors.each do |v|
     next unless v['type'] == 'voltage'
     @voltage_sensor_data  <<  Boattr::Voltage.new(v['name'], v['address']).read
+  end
+
+  enabled_sensors.each do |v|
+    next unless v['type'] == 'depth'
+    @depth_sensor_data  <<  Boattr::Depth.new(v['name'], v['address']).read
   end
 
   @misc_sensor_data = [

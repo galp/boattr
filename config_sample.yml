@@ -74,8 +74,8 @@ sensors:
        address:
          adc: adc1
          pin: 6
-   pressure:
+   depth:
      watertank:
        address:
          adc: adc0
-         pin: 1
+         pin: 7
