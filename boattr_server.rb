@@ -18,6 +18,7 @@ scheduler.every '1m', :first_in => 0.1 do
   @sensor_data         = []
   @voltage_sensor_data = []
   @depth_sensor_data   = []
+
   enabled_sensors.each do |v|
     next unless v['type'] == 'temp'
     @temp_sensor_data <<  Boattr::Sensors::Temp.new(v['name'], v['address']).read
@@ -46,23 +47,22 @@ scheduler.every '1m', :first_in => 0.1 do
   @sensor_data.concat(@temp_sensor_data)
   @sensor_data.concat(@voltage_sensor_data)
   @sensor_data.concat(@misc_sensor_data)
-
+  @sensor_data.concat(@depth_sensor_data)
+  puts "sending sensor data to couchdb"
   Boattr::Data.new(config).to_db(@sensor_data)
 
   dash = Boattr::Dashing.new(config)
   dash.list_to_dashboard(@current_sensor_data, 'amps')
   dash.list_to_dashboard(@temp_sensor_data, 'temps')
   dash.to_dashboard(@sensor_data)
-
+  puts "sending sensor data to graphite"
   Boattr::Data.new(config).to_graphite(@sensor_data)
 
-  
   stove = Boattr::Control::Stove.new(@temp_sensor_data)
   control = Boattr::Control.new
   temp_index = control.temp_index(@temp_sensor_data)
 
-  puts "temp index : #{temp_index} stove hot : #{stove.is_hot}"
-  pump_pin = nil
+  pump_pin = '30'
   if pump_pin.nil? || pump_pin.empty? do 
        pump  = Boattr::Control::Pump.new('calorifier pump', pump_pin)
        pump.on if temp_index > 19 && stove.is_hot
@@ -70,5 +70,6 @@ scheduler.every '1m', :first_in => 0.1 do
        pump.off unless stove.is_hot
      end	
   end
+  puts '* done'
 end
 scheduler.join

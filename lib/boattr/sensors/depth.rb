@@ -9,7 +9,7 @@ module Boattr
     def read
       return if @@data.nil? || @@data.empty? || @@data[address['adc']].nil?
       @raw     = @@data[address['adc']][address['pin']]
-      @depth  = (@raw.to_i/48) * 0.95 
+      @depth  = (@raw.to_i-50) * 0.95 
       { 'name' => name, 'type' => 'depth', 'raw' => @raw, 'value' => @depth.round(2) }
     end
   end
