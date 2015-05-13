@@ -10,7 +10,7 @@ module Boattr
     end
 
     def read
-      return if @@data.nil? || @@data.empty? || @@data[address].nil?
+      return if @@data.nil? || @@data.empty? || @@data[address['adc']].nil?
       @raw     = @@data[address['adc']][address['pin']]
       @volts   = (@raw.to_i * 0.004887)
       # a load should only be negative and  a source should be positive
