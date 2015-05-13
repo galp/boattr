@@ -18,5 +18,13 @@ module Boattr
       end
       @data
     end
+    def self.enabled_adc(config = read)
+      @data = {}
+      config['i2c']['i2cAdc'].each() do |k,v|
+        next if v['disabled']
+        @data[k] = v
+      end
+      return @data
+    end
   end
 end

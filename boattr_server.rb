@@ -9,7 +9,8 @@ scheduler       = Rufus::Scheduler.new
 scheduler.every '1m', :first_in => 0.1 do
   config          = Boattr::Config.read(File.dirname(__FILE__) + '/' + 'config.yml')
   enabled_sensors = Boattr::Config.enabled_sensors(config)
-  sensors         = Boattr::Sensors.new(config)
+  enabled_adc     = Boattr::Config.enabled_adc(config)
+  sensors         = Boattr::Sensors.new(enabled_adc)
   allowance       = Boattr::Data.new(config)
 
   @current_sensor_data = []
