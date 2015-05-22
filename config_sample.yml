@@ -10,6 +10,7 @@ i2c:
        address: 0x20
        dev: "I2C2"
        type: "arduino"
+       pins: 4
        description: "arduino uno analog ports via i2c"
 couchdb:
    host: localhost
