@@ -1,0 +1,11 @@
+[Unit]
+Description=Dashing Service
+After=network.target
+
+[Service]
+WorkingDirectory=/root/boattr-dash/
+ExecStart=/usr/local/bin/dashing start
+
+[Install]
+WantedBy=multi-user.target
+

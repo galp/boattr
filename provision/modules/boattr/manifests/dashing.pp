@@ -19,10 +19,10 @@ class boattr::dashing (
   apt::force { 'libc6':
     release     => 'testing',
   }
-  file {'/etc/init.d/dashing' : 
+  file {'/etc/systemd/system/dashing.service' : 
     ensure  => present,
     mode    => 0755,
-    content => template("${module_name}/dashing-service.erb"),
+    content => template("${module_name}/dashing_service.erb"),
     notify  => Service['dashing'],
   }
   service {'dashing' :
