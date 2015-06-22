@@ -15,6 +15,7 @@ class boattr::couchdb (
     ensure  => present,
     content => template("${module_name}/local.ini"),
     notify  => Service['couchdb'],
+    require => [ Package['couchdb'],
   }
   file { $db_dir :
     ensure  => directory,

@@ -18,7 +18,7 @@ class boattr::apt (
     release           => 'testing',
     repos             => 'main contrib non-free',
     required_packages => 'debian-keyring debian-archive-keyring',
-    include_deb       => true
+    include           => { 'deb' => true }
   }
   apt::source { 'debian_unstable':
     comment           => 'uk debian unstable mirror',
@@ -26,7 +26,7 @@ class boattr::apt (
     release           => 'unstable',
     repos             => 'main contrib non-free',
     required_packages => 'debian-keyring debian-archive-keyring',
-    include_deb       => true
+    include           => { 'deb' => true }
   }
 
   apt::source { 'debian_stable':
@@ -34,14 +34,14 @@ class boattr::apt (
     location          => 'http://ftp.uk.debian.org/debian/ ',
     release           => $::lsbdistcodename,
     repos             => 'main contrib non-free',
-    include_deb       => true
+    include           => { 'deb' => true }
   }
   apt::source { "${::lsbdistcodename}_updates":
     comment           => 'debian updates',
     location          => 'http://ftp.uk.debian.org/debian/ ',
     release           => "${::lsbdistcodename}-updates",
     repos             => 'main contrib non-free',
-    include_deb       => true
+    include           => { 'deb' => true }
   }
 
   apt::source { 'security':
@@ -49,7 +49,7 @@ class boattr::apt (
     location          => 'http://security.debian.org/',
     release           => "${::lsbdistcodename}/updates",
     repos             => 'main contrib non-free',
-    include_deb       => true
+    include           => { 'deb' => true }
   }
 
   case $board {
@@ -59,7 +59,7 @@ class boattr::apt (
         location          => '[arch=armhf] http://debian.beagleboard.org/packages',
         release           => "wheezy-bbb",
         repos             => 'main',
-        include_deb       => true
+        include           => { 'deb' => true }
       }
     }
     default: {}
