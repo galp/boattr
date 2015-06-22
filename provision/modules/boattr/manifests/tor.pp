@@ -9,17 +9,12 @@ class boattr::tor (
   $packagelist = ['tor','tor-geoipdb']
   package { $packagelist :
     ensure  => latest,
-    require => Apt::Force['tor']
   }
 
   apt::source { 'tor_apt_repo':
     location   => 'http://deb.torproject.org/torproject.org',
     repos      => 'main',
     key        => 'A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89',
-  }
-  apt::force { 'tor':
-    release => 'testing',
-    require => Apt::Source['tor_apt_repo']
   }
 
   file { '/etc/tor/torrc':

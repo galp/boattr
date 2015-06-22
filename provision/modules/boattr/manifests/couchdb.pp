@@ -5,13 +5,17 @@ class boattr::couchdb (
   ) inherits boattr::params
 {
   require boattr::apt
-  package { 'couchdb' : ensure => installed}
+  package{ 'couchdb':
+    ensure          => installed,
+    install_options => "-t unstable"
+    
+  }
 
   file {'/etc/couchdb/local.ini' : 
     ensure  => present,
     content => template("${module_name}/local.ini"),
     notify  => Service['couchdb'],
-    require => Package['couchdb'],
+    require => Apt::Force['couchdb'],
   }
   file { $db_dir :
     ensure  => directory,

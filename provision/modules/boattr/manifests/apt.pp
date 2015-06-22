@@ -2,11 +2,12 @@ class boattr::apt (
   $board    = $::boattr::params::board,
 )
 {
-  
-  class { '::apt::release':
-    release_id => 'wheezy',
+  apt::conf { 'release':
+    content  => 'APT::Default-Release "jessie";',
+    priority => '01',
   }
-  class { '::apt': purge_sources_list => true }
+  class { '::apt': purge => { 'sources.list' => true} }
+  
   file { '/etc/apt/apt.conf.d/50no_install_recommends':
     ensure => present,
     content => 'APT::Install-Recommends "0";',
@@ -19,6 +20,15 @@ class boattr::apt (
     required_packages => 'debian-keyring debian-archive-keyring',
     include_deb       => true
   }
+  apt::source { 'debian_unstable':
+    comment           => 'uk debian unstable mirror',
+    location          => 'http://ftp.uk.debian.org/debian/ ',
+    release           => 'unstable',
+    repos             => 'main contrib non-free',
+    required_packages => 'debian-keyring debian-archive-keyring',
+    include_deb       => true
+  }
+
   apt::source { 'debian_stable':
     comment           => 'uk debian stable mirror',
     location          => 'http://ftp.uk.debian.org/debian/ ',
@@ -43,11 +53,11 @@ class boattr::apt (
   }
 
   case $board {
-    'BeagleBoneBlack': {
+    'BeagleBoneBlack': {  # FIXME wrong repo.
       apt::source { 'beaglebone_debian':
         comment           => 'beaglebone debian',
         location          => '[arch=armhf] http://debian.beagleboard.org/packages',
-        release           => "${::lsbdistcodename}-bbb",
+        release           => "wheezy-bbb",
         repos             => 'main',
         include_deb       => true
       }

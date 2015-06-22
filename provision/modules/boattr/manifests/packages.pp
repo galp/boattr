@@ -10,15 +10,15 @@ class boattr::packages (
   $puppetpackagelist = ['puppet','hiera']
 
   
-  apt::force { $puppetpackagelist: release => 'testing' }
-  apt::force { $rubypackagelist: release => 'testing' }
-  apt::force { $packagelist: release => 'testing' }
+  package { $puppetpackagelist: ensure => installed }
+  package { $rubypackagelist: ensure => installed }
+  package { $packagelist: ensure => installed }
 
 
   case $devel {
     true: {
       notice('With some handy  packages')
-      apt::force { $devpackagelist: release => 'testing' }
+      package { $devpackagelist: ensure => installed }
     }
     false: {
       package { $devpackagelist :

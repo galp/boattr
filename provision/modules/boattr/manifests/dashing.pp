@@ -6,7 +6,7 @@ class boattr::dashing (
 ) inherits boattr::params
 {
   require boattr::apt
-  $packages = ['nodejs','libv8-3.14.5','libssl-dev','zlib1g-dev']
+  $packages = ['nodejs','libv8-3.14.5','libssl-dev']
   package {'dashing' :
     ensure   => installed,
     provider => gem,
@@ -14,10 +14,6 @@ class boattr::dashing (
   }
   package { $packages :
     ensure  => installed,
-    require => Apt::Force['libc6']
-  }
-  apt::force { 'libc6':
-    release     => 'testing',
   }
   file {'/etc/systemd/system/dashing.service' : 
     ensure  => present,
@@ -28,7 +24,7 @@ class boattr::dashing (
   service {'dashing' :
     ensure => running,
     enable => true,
-    require => [File['/etc/init.d/dashing'], Exec['install_dashing'],Package['nodejs']],
+    require => [File['/etc/systemd/system/dashing.service'], Exec['install_dashing'],Package['nodejs']],
   }
 
   exec {'install_dashing' :
