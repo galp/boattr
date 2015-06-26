@@ -1,5 +1,5 @@
 ---
-boattr::with_tor: unset
+boattr::with_tor: false
 boattr::lan_ip: "192.168.8.200"
 boattr::lan_gw: "192.168.8.1"
 boattr::wifi_ssid: unset

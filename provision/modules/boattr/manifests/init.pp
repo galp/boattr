@@ -31,7 +31,7 @@ class boattr (
 {
   $bridge_ports    = "${wired_iface} ${usb_iface}"
   require boattr::packages
-  if $with_tor == 'unset' {
+  if $with_tor == false {
     notice('tor gateway is disabled')
   }
   else {
