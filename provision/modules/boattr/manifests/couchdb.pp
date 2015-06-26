@@ -7,7 +7,7 @@ class boattr::couchdb (
   require boattr::apt
   package{ 'couchdb':
     ensure          => installed,
-    install_options => ['-t unstable']
+    install_options => ['-t', 'unstable']
   }
 
   file {'/etc/couchdb/local.ini' : 
