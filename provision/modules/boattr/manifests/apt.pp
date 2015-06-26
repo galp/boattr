@@ -53,11 +53,11 @@ class boattr::apt (
   }
 
   case $board {
-    'BeagleBoneBlack': {  # FIXME wrong repo.
+    'BeagleBoneBlack': {
       apt::source { 'beaglebone_debian':
         comment           => 'beaglebone debian',
-        location          => '[arch=armhf] http://debian.beagleboard.org/packages',
-        release           => "wheezy-bbb",
+        location          => '[arch=armhf] http://repos.rcn-ee.net/debian/',
+        release           => "${::lsbdistcodename}",
         repos             => 'main',
         include           => { 'deb' => true }
       }
