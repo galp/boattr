@@ -17,7 +17,7 @@ DNSListenAddress <%= @lan_ip%>
 ## all (and only) requests that reach a SocksPort. Untrusted users who
 ## can access your SocksPort may be able to learn about the connections
 ## you make.  
-SocksPolicy accept 192.168.8.0/16
+SocksPolicy accept <%= @lan_ip%>
 #SocksPolicy reject *
 
 ## Logs go to stdout at level "notice" unless redirected by something
