@@ -7,3 +7,5 @@
 /.vagrant/
 .tmp/
 /run/
+/modules/
+/.librarian/

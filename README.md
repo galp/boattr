@@ -16,18 +16,11 @@ Make sure there is internet connectivity as well.
 ##change the hostname 
 replace name in /etc/hostname and /etc/hosts. A restart is required after this step or before running puppet below.
 
-##Install puppet and git
+##Install puppet git and librarian
 
 ```
 apt-get update
-apt-get install puppet git
-```
-
-##Install some puppet modules we need
-```
-puppet module install puppetlabs/apt
-puppet module install puppetlabs/ntp
-puppet module install puppetlabs/vcsrepo 
+apt-get install puppet git librarian-puppet
 ```
 ##clone the  repo
 
@@ -36,6 +29,11 @@ cd /root/
 git clone git://github.com/galp/boattr.git
 cd boattr
 ```
+##Install the required puppet modules with librarian
+```
+librarian-puppet install
+```
+
 ##customise puppet
 
 Have a look in provision/default.pp. You can either modify the
