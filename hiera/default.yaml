@@ -6,3 +6,54 @@ boattr::phone_mac: unset
 boattr::wifi_mac: unset
 boattr::with_tor: true
 boattr::data_dev: unset
+apt::sources:
+  'debian_stable':
+      location: 'http://ftp.uk.debian.org/debian'
+      release: 'jessie'
+      repos: 'main contrib non-free'
+      key:
+        id: '126C0D24BD8A2942CC7DF8AC7638D0442B90D010'
+        server: 'subkeys.pgp.net'
+      include:
+        deb: true
+  'debian_testing':
+      location: 'http://ftp.uk.debian.org/debian'
+      release: 'testing'
+      repos: 'main contrib non-free'
+      key:
+        id: '126C0D24BD8A2942CC7DF8AC7638D0442B90D010'
+        server: 'subkeys.pgp.net'
+      include:
+        deb: true
+  'debian_unstable':
+      location: 'http://ftp.uk.debian.org/debian'
+      release: 'unstable'
+      repos: 'main contrib non-free'
+      key:
+        id: '126C0D24BD8A2942CC7DF8AC7638D0442B90D010'
+        server: 'subkeys.pgp.net'
+      include:
+        deb: true
+  'debian_security':
+      location: 'http://security.debian.org'
+      release: 'jessie/updates'
+      repos: 'main contrib non-free'
+      key:
+        id: 'D21169141CECD440F2EB8DDA9D6D8F6BC857C906'
+        server: 'subkeys.pgp.net'
+      include:
+        deb: true
+  'debian_updates':
+      location: 'http://ftp.uk.debian.org/debian'
+      release: 'jessie-updates'
+      repos: 'main contrib non-free'
+      key:
+        id: '126C0D24BD8A2942CC7DF8AC7638D0442B90D010'
+        server: 'subkeys.pgp.net'
+      include:
+        deb: true
+apt::purge:
+  sources.list: true
+  sources.list.d: true
+apt::update:
+  frequency: 'daily'
