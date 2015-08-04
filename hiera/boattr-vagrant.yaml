@@ -7,3 +7,6 @@ boattr::wired_iface: "eth1"
 boattr::wan_iface: "eth1"
 boattr::devel: false
 boattr::board: unset
+boattr::internet_devices_mac:
+ - 11:22:33:44:55
+ - 66:77:88:99:00

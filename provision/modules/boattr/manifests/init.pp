@@ -27,6 +27,7 @@ class boattr (
   $wifi_mac     = $::boattr::params::wifi_mac,
   $data_dev      = $::boattr::params::data_dev,
   $wpa_psk       = $::boattr::params::wpa_psk,
+  $internet_devices_mac = '',
   ) inherits boattr::params
 {
   $bridge_ports    = "${wired_iface} ${usb_iface}"
@@ -109,7 +110,7 @@ class boattr (
       enable  => false,
   }
 
-    service { 'udev' :
+  service { 'udev' :
     ensure  => running,
     enable  => true,
   }
