@@ -1,6 +1,6 @@
 <% if @internet_devices_mac %>
 <% @internet_devices_mac.each_with_index do |d,i| -%>
-SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="<%= d %>", NAME="phone<%= i %>", RUN+="<%= @bin_dir %><%= @masq_script %> <%= @lan_ifacex %> phone<%= i %>"
+SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="<%= d %>", NAME="phone<%= i %>", RUN+="<%= @bin_dir %>/<%= @masq_script %> <%= @lan_ifacex %> phone<%= i %>"
 <% end %>
 <% end %>
 SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="<%= @wifi_mac %>", NAME="wifi0", RUN+="/usr/bin/service hostap restart"

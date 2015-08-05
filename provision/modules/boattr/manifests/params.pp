@@ -25,7 +25,6 @@ class boattr::params {
   $wifi_mac        = undef
   $wpa_psk         = 'c509d57e399416e0c5203a5023c65ad516bb4167632a8a24ba05c9e66b28ae09' # create with wpa_passphrase command
   $wifi_channel    = '11'
-  $phone_mac       = undef
   $dash_host       = 'localhost'
   $dash_parent_dir = '/root'
   $dash_name       = "${basename}-dash"

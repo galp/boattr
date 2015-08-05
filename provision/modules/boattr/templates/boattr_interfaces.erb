@@ -2,7 +2,7 @@
 auto lo
 iface lo inet loopback
 
-# primary network interface
+# wired ethernet
 auto <%= @wired_iface %>
 iface <%= @wired_iface %> inet manual
 
@@ -23,12 +23,15 @@ iface wlan1 inet manual
 auto usb0
 iface usb0 inet manual
 
-#tethering phone <%= @phone_mac %>
-allow-hotplug phone0
-iface phone0 inet dhcp
+<% if @internet_devices_mac %>
+#internet providing devices (dongles,tethered phones)
 
-allow-hotplug usb1
-iface usb1 inet dhcp
+<% @internet_devices_mac.each_with_index do |d,i| -%>
+allow-hotplug phone<%= i %>
+iface phone<%= i %> inet dhcp
+<% end %>
+
+<% end %>
 
 # bridge
 auto br0

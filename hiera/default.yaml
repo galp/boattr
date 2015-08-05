@@ -2,7 +2,6 @@
 boattr::lan_ip: "192.168.8.1"
 boattr::wifi_ssid: "boattr"
 boattr::wpa_psk: "c509d57e399416e0c5203a5023c65ad516bb4167632a8a24ba05c9e66b28ae09"
-boattr::phone_mac: unset
 boattr::wifi_mac: unset
 boattr::with_tor: true
 boattr::data_dev: unset
@@ -57,3 +56,11 @@ apt::purge:
   sources.list.d: true
 apt::update:
   frequency: 'daily'
+tor::gateway: true
+tor::ip: "%{::ipaddress_lo}"
+tor::hidden_service: true
+tor::hidden_service_dir: "boattr"
+tor::hidden_service_ports:
+  - "22"
+  - "3030"
+  - "5984"
