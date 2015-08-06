@@ -18,7 +18,7 @@ class boattr (
   $lan_dns       = $::boattr::params::lan_dns,
   $wired_iface   = $::boattr::params::wired_iface,
   $wan_iface     = $::boattr::params::wan_iface,
-  $tor_gateway   = $::boattr::params::tor_gateway,
+  
   $bin_dir       = $::boattr::params::bin_dir,
   $masq_script   = $::boattr::params::masq_script,
   $with_tor      = $::boattr::params::with_tor,
@@ -35,8 +35,8 @@ class boattr (
     notice('tor gateway is disabled')
   }
   else {
-    class { 'boattr::tor': lan_ip => $lan_ip }
     notice('tor gateway is enabled')
+    class {'tor': ip => $lan_ip}
   }
   if $wifi_ssid == 'unset' {
     notice('wireless AP is disabled')
