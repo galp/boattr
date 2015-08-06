@@ -17,7 +17,7 @@ iptables -t nat -F
 iptables -F
 iptables -t nat -A POSTROUTING -o $WAN -j MASQUERADE
 
-<% if @tor_gateway %>
+<% if @with_tor %>
 iptables -t nat -A OUTPUT -d $LOCAL_NET -j RETURN
 iptables -t nat -A PREROUTING -i $LAN -d $LOCAL_NET -j RETURN
 iptables -t nat -A PREROUTING -i $LAN -p udp --dport 53 -j REDIRECT --to-ports 53
