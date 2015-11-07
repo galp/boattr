@@ -35,7 +35,7 @@ class boattr (
   }
   else {
     notice('tor gateway is enabled')
-    class {'::tor': ip => $lan_ip }
+    class {'::tor': ip => $lan_ip, gateway => true }
   }
   if $wifi_ssid == 'unset' {
     notice('wireless AP is disabled')
