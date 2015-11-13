@@ -62,14 +62,13 @@ scheduler.every '1m', :first_in => 0.1 do
   control = Boattr::Control.new
   temp_index = control.temp_index(@temp_sensor_data)
 
-  pump_pin = '30'
-  if pump_pin.nil? || pump_pin.empty? do 
-       pump  = Boattr::Control::Pump.new('calorifier pump', pump_pin)
-       pump.on if temp_index > 19 && stove.is_hot
-       pump.off if temp_index < 19
-       pump.off unless stove.is_hot
-     end	
-  end
+  pump_pin = 'P9_12'
+  pump  = Boattr::Control::Pump.new('calorifier pump', pump_pin)
+  pump.on if temp_index > 19 && stove.is_hot
+  pump.off if temp_index < 19
+  pump.off unless stove.is_hot
+  
+
   puts '* done'
 end
 scheduler.join

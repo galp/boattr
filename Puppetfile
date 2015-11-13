@@ -1,4 +1,4 @@
-forge "https://forgeapi.puppetlabs.com"
+forge "https://forge.puppetlabs.com"
 mod 'puppetlabs/apt'
 mod 'puppetlabs/firewall'
 mod 'puppetlabs/ntp'
