@@ -17,7 +17,7 @@ class boattr::dashing (
   }
   file {'/etc/systemd/system/dashing.service' : 
     ensure  => present,
-    mode    => 0755,
+    mode    => '0755',
     content => template("${module_name}/dashing_service.erb"),
     notify  => Service['dashing'],
   }
