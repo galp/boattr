@@ -1,8 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 Vagrant.configure(2) do |config|
-  #config.vm.box = 'puphpet/debian75-x64'
-  config.vm.box = 'jessie_puppet'
+  #config.vm.box = 'jessie_puppet'
+  config.vm.box = "debian8-puppet"
   config.vm.hostname  = 'boattr-vagrant'
   config.vm.network 'forwarded_port', guest: 3030, host: 3030 # dashboard
   config.vm.network 'forwarded_port', guest: 5984, host: 5984 # couchdb
@@ -12,6 +12,7 @@ Vagrant.configure(2) do |config|
     puppet.module_path = ['provision/modules', 'modules']
     puppet.hiera_config_path = 'hiera/hiera.yaml'
     puppet.working_directory = '/vagrant'
+    puppet.options = ["--parser=future"] 
   end
   config.vm.provider 'virtualbox' do |vb|
     vb.memory = '512'
