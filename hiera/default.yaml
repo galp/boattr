@@ -1,6 +1,7 @@
 ---
 classes:
   - apt
+  - ntp
 boattr::lan_ip: "192.168.8.1"
 boattr::wifi_ssid: "boattr"
 boattr::wpa_psk: "c509d57e399416e0c5203a5023c65ad516bb4167632a8a24ba05c9e66b28ae09"
@@ -67,3 +68,16 @@ tor::hidden_service_ports:
   - "22"
   - "3030"
   - "5984"
+ntp::servers:
+  - "0.debian.pool.ntp.org"
+  - "1.debian.pool.ntp.org"
+  - "2.debian.pool.ntp.org"
+ntp::restrict:
+  - "restrict default kod nomodify notrap nopeer noquery"
+  - "restrict -6 default kod nomodify notrap nopeer noquery"
+  - "restrict 127.0.0.1"
+  - "restrict -6 ::1"
+  - "restrict 127.127.1.0"
+ntp::iburst_enable: true
+ntp::tinker: true
+ntp::stepout: 600
