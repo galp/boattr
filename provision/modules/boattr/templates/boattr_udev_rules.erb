@@ -1,5 +1,5 @@
-<% if @internet_devices_mac %>
-<% @internet_devices_mac.each_with_index do |d,i| -%>
+<% if @netdev_mac_list %>
+<% @netdev_mac_list.each_with_index do |d,i| -%>
 SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="<%= d %>", NAME="phone<%= i %>", RUN+="<%= @bin_dir %>/<%= @masq_script %> <%= @lan_iface %> phone<%= i %>"
 <% end %>
 <% end %>

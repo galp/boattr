@@ -39,4 +39,5 @@ class boattr::params {
   $masq_script     = 'masq.sh'
   $dhcp_auth       = undef
   $with_tor        = true
+  $netdev_mac_list = undef
 }

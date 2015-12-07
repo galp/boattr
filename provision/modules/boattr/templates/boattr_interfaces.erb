@@ -23,10 +23,10 @@ iface wlan1 inet manual
 auto usb0
 iface usb0 inet manual
 
-<% if @internet_devices_mac %>
+<% if @netdev_mac_list %>
 #internet providing devices (dongles,tethered phones)
 
-<% @internet_devices_mac.each_with_index do |d,i| -%>
+<% @netdev_mac_list.each_with_index do |d,i| -%>
 allow-hotplug phone<%= i %>
 iface phone<%= i %> inet dhcp
 <% end %>
